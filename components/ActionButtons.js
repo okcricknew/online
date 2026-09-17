@@ -1,25 +1,32 @@
 export default function ActionButtons() {
   return (
-    <div className="bg-[#0086cb] px-4 pb-4 pt-2">
-      <div className="bg-white rounded-xl p-3 flex justify-around shadow-lg">
-        <div className="flex flex-col items-center text-xs font-semibold text-gray-700 cursor-pointer">
-          <div className="bg-green-100 p-3 rounded-full mb-1 text-green-600">📥</div>
+    <div className="bg-[#0086cb] px-4 pb-4">
+      <div className="bg-white rounded-2xl p-4 flex justify-around shadow-md">
+        <div className="flex flex-col items-center text-[11px] font-bold text-gray-700 cursor-pointer">
+          <div className="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center mb-1 text-green-600 text-lg shadow-sm border border-green-100">
+            📥
+          </div>
           DEPOSIT
         </div>
-        <div className="flex flex-col items-center text-xs font-semibold text-gray-700 cursor-pointer">
-          <div className="bg-green-100 p-3 rounded-full mb-1 text-green-600">📤</div>
+        <div className="flex flex-col items-center text-[11px] font-bold text-gray-700 cursor-pointer">
+          <div className="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center mb-1 text-green-600 text-lg shadow-sm border border-green-100">
+            💳
+          </div>
           WITHDRAW
         </div>
-        <div className="flex flex-col items-center text-xs font-semibold text-gray-700 cursor-pointer">
-          <div className="bg-green-100 p-3 rounded-full mb-1 text-green-600">💬</div>
+        <div className="flex flex-col items-center text-[11px] font-bold text-gray-700 cursor-pointer">
+          <div className="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center mb-1 text-green-600 text-lg shadow-sm border border-green-100">
+            💬
+          </div>
           WHATSAPP
         </div>
-        <div className="flex flex-col items-center text-xs font-semibold text-gray-700 cursor-pointer">
-          <div className="bg-orange-100 p-3 rounded-full mb-1 text-orange-600">🎧</div>
+        <div className="flex flex-col items-center text-[11px] font-bold text-gray-700 cursor-pointer">
+          <div className="w-12 h-12 bg-orange-50 rounded-full flex items-center justify-center mb-1 text-orange-500 text-lg shadow-sm border border-orange-100">
+            🎧
+          </div>
           LIVE CHAT
         </div>
       </div>
     </div>
   );
 }
-
