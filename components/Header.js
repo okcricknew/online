@@ -7,7 +7,7 @@ export default function Header() {
           <span className="text-2xl cursor-pointer">☰</span>
           <div className="flex items-center gap-1 font-bold text-xl tracking-wider">
             <span className="bg-white text-[#0086cb] px-1 rounded text-sm">👑</span>
-            <span>Laksh <span className="font-light">365</span></span>
+            <span>Online <span className="font-light">365</span></span>
           </div>
         </div>
         <div className="flex items-center gap-3">
