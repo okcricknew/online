@@ -1,6 +1,6 @@
 export default function Header() {
   return (
-    <div className="bg-[#18a4e0] text-white z-51">
+    <div className="sticky top-0 z-50 bg-[#18a4e0] text-white shadow-md">
       <div className="flex justify-between items-center px-4 pt-4">
         <div className="flex items-center gap-3">
           <span className="text-3xl">☰</span>
