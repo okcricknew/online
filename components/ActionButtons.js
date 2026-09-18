@@ -1,31 +1,25 @@
+function Item({ icon, title }) {
+  return (
+    <div className="flex flex-col items-center">
+      <div className="w-16 h-16 rounded-full border-2 border-black bg-white flex items-center justify-center text-3xl">
+        {icon}
+      </div>
+
+      <span className="font-bold mt-2 text-[14px]">
+        {title}
+      </span>
+    </div>
+  );
+}
+
 export default function ActionButtons() {
   return (
-    <div className="bg-[#0086cb] px-4 pb-4">
-      <div className="bg-white rounded-2xl p-4 flex justify-around shadow-md">
-        <div className="flex flex-col items-center text-[11px] font-bold text-gray-700 cursor-pointer">
-          <div className="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center mb-1 text-green-600 text-lg shadow-sm border border-green-100">
-            📥
-          </div>
-          DEPOSIT
-        </div>
-        <div className="flex flex-col items-center text-[11px] font-bold text-gray-700 cursor-pointer">
-          <div className="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center mb-1 text-green-600 text-lg shadow-sm border border-green-100">
-            💳
-          </div>
-          WITHDRAW
-        </div>
-        <div className="flex flex-col items-center text-[11px] font-bold text-gray-700 cursor-pointer">
-          <div className="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center mb-1 text-green-600 text-lg shadow-sm border border-green-100">
-            💬
-          </div>
-          WHATSAPP
-        </div>
-        <div className="flex flex-col items-center text-[11px] font-bold text-gray-700 cursor-pointer">
-          <div className="w-12 h-12 bg-orange-50 rounded-full flex items-center justify-center mb-1 text-orange-500 text-lg shadow-sm border border-orange-100">
-            🎧
-          </div>
-          LIVE CHAT
-        </div>
+    <div className="px-4 -mt-2">
+      <div className="bg-white border-2 border-black rounded-[20px] py-5 px-2 flex justify-around">
+        <Item icon="💰" title="DEPOSIT" />
+        <Item icon="🏧" title="WITHDRAW" />
+        <Item icon="🟢" title="WHATSAPP" />
+        <Item icon="📺" title="LIVE CHAT" />
       </div>
     </div>
   );
