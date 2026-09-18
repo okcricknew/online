@@ -1,25 +1,55 @@
 export default function GameCard({ game }) {
+  const isOpen =
+    game.isOpen ||
+    game.status?.toLowerCase().includes("running");
+
   return (
-    <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-200 relative">
-      <div className="flex justify-between items-start">
+    <div className="bg-white border-2 border-black rounded-[22px] p-4 relative">
+      <div className="flex justify-between">
         <div>
-          <h2 className="font-extrabold text-base text-gray-900 tracking-wide">{game.title}</h2>
-          <p className="text-red-600 font-bold text-[11px] mt-0.5 tracking-wider">{game.status || "CLOSED FOR TODAY"}</p>
+          <h2 className="text-[22px] font-black uppercase">
+            {game.title}
+          </h2>
+
+          <p
+            className={`font-bold text-[16px] mt-1 ${
+              isOpen ? "text-green-600" : "text-red-600"
+            }`}
+          >
+            {isOpen
+              ? "RUNNING FOR OPEN"
+              : "CLOSED FOR TODAY"}
+          </p>
         </div>
-        <span className="text-[#0086cb] font-extrabold text-lg tracking-wider">{game.numbers}</span>
+
+        <div className="text-[#3aa6e8] font-black text-[18px]">
+          {game.numbers || "***-**-***"}
+        </div>
       </div>
 
-      <div className="flex justify-between items-center mt-3 pt-3 border-t border-gray-100 text-xs">
+      <div className="flex justify-between mt-6">
         <div>
-          <p className="text-gray-400 font-semibold text-[10px] tracking-wider">OPEN BIDS</p>
-          <p className="font-extrabold text-gray-800 mt-0.5">{game.openBids}</p>
+          <p className="text-[14px]">OPEN BIDS</p>
+          <p className="font-black text-[18px]">
+            {game.openBids}
+          </p>
         </div>
+
         <div>
-          <p className="text-gray-400 font-semibold text-[10px] tracking-wider">CLOSE BIDS</p>
-          <p className="font-extrabold text-gray-800 mt-0.5">{game.closeBids}</p>
+          <p className="text-[14px]">CLOSE BIDS</p>
+          <p className="font-black text-[18px]">
+            {game.closeBids}
+          </p>
         </div>
-        <div className="w-7 h-7 rounded-full bg-red-50 text-red-500 flex items-center justify-center font-bold text-sm border border-red-100">
-          ✕
+
+        <div
+          className={`w-14 h-14 rounded-full border-2 flex items-center justify-center text-3xl font-black ${
+            isOpen
+              ? "bg-green-500 text-white"
+              : "bg-red-500 text-white"
+          }`}
+        >
+          {isOpen ? "✓" : "✕"}
         </div>
       </div>
     </div>
