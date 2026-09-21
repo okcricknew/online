@@ -29,12 +29,12 @@ export default function Header() {
         </div>
 
         {/* Scrolling Welcome Text */}
-        <div className="px-3 py-0.5 overflow-hidden whitespace-nowrap font-bold text-xs bg-black/10">
+        <div className="px-3 py-0.5 overflow-hidden whitespace-nowrap font-bold text-xs">
           WELCOME TO LAKSH365, ARISE, AWAKE AND STOP NOT UNTIL THE GOAL IS ACHIEVED
         </div>
 
         {/* Starline and Jackpot Buttons */}
-        <div className="grid grid-cols-2 gap-2.5 px-4 pt-2.5">
+        <div className="grid grid-cols-2 gap-2.5 px-4 pt-2">
           <button className="bg-white text-black border-2 border-black rounded-[20px] py-2 font-black text-lg shadow-md">
             ▶ STARLINE
           </button>
