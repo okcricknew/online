@@ -1,20 +1,16 @@
-import Header from '@/components/Header';
-import MarketList from '@/components/MarketList';
-import BottomNav from '@/components/BottomNav';
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
+import MainDashboard from '@/components/MainDashboard';
 
-export default function Home() {
-  return (
-    <div className="max-w-xl mx-auto relative min-h-screen pb-20">
-      {/* Header Component */}
-      <Header />
-      
-      {/* Market List Component */}
-      <main className="p-4 flex flex-col gap-4">
-        <MarketList />
-      </main>
+export default async function Page() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get('auth_token');
 
-      {/* Bottom Navigation Component */}
-      <BottomNav />
-    </div>
-  );
-}
+  // Agar user logged-in nahi hai, toh login page par bhej do
+  if (!token) {
+    redirect('/login');
+  }
+
+  // Agar logged-in hai, toh MainDashboard (MPIN + Header + Market List) render karo
+  return <MainDashboard />;
+    }
