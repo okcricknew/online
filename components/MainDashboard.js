@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import Header from './Header';
-import MarketList from './MarketList';
-import BottomNav from './BottomNav';
+import Header from '@/components/Header';
+import MarketList from '@/components/MarketList';
+import BottomNav from '@/components/BottomNav';
 
 export default function MainDashboard() {
   const [isUnlocked, setIsUnlocked] = useState(false);
