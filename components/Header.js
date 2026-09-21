@@ -34,7 +34,7 @@ export default function Header() {
         </div>
 
         {/* Starline and Jackpot Buttons */}
-        <div className="grid grid-cols-2 gap-2.5 px-4 pt-2">
+        <div className="grid grid-cols-2 gap-2.5 px-4 pt-2 pb-1">
           <button className="bg-white text-black border-2 border-black rounded-[20px] py-2 font-black text-lg shadow-md">
             ▶ STARLINE
           </button>
