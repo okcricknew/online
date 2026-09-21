@@ -1,6 +1,6 @@
 export default function Header() {
   return (
-    <div className="sticky top-0 z-50 bg-gray-100 pb-2">
+    <div className="sticky top-0 z-50 bg-gray-100 pb-1">
       {/* Blue Header Section */}
       <div className="bg-[#18a4e0] text-white shadow-md rounded-b-[30px] pb-5">
         
