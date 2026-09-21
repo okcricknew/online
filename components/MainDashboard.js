@@ -6,7 +6,7 @@ import MPINLock from '@/components/MPINLock';
 export default function MainDashboard() {
   return (
     <MPINLock>
-      <div className="max-w-xl mx-auto relative min-h-screen pb-20 bg-gray-50">
+      <div className="max-w-xl mx-auto relative min-h-screen pb-20 bg-gray-55">
         <Header />
 
         <main className="p-4 flex flex-col gap-4">
