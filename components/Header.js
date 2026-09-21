@@ -1,4 +1,10 @@
+'use client';
+
+import { useState } from 'react';
+
 export default function Header() {
+  const [isNotificationsOn, setIsNotificationsOn] = useState(true);
+
   return (
     <div className="sticky top-0 z-50 bg-gray-100 pb-1">
       {/* Blue Header Section */}
@@ -22,9 +28,18 @@ export default function Header() {
               <span className="text-sm">👛</span> ₹0.00
             </div>
 
-            <div className="w-9 h-9 bg-black rounded-full flex items-center justify-center shadow-inner text-sm">
-              🔔
-            </div>
+            {/* Interactive Notification Bell Button (SSR Friendly) */}
+            <button
+              onClick={() => setIsNotificationsOn(!isNotificationsOn)}
+              className={`w-9 h-9 rounded-full flex items-center justify-center shadow-inner text-sm transition-all duration-200 cursor-pointer ${
+                isNotificationsOn 
+                  ? 'bg-black text-white' 
+                  : 'bg-gray-800 text-gray-400 opacity-80'
+              }`}
+              title={isNotificationsOn ? "Notifications ON" : "Notifications OFF"}
+            >
+              {isNotificationsOn ? '🔔' : '🔕'}
+            </button>
           </div>
         </div>
 
@@ -45,40 +60,35 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Action Buttons Box (Compact Height, Attached & Overlapping) */}
-      <div className="px-4 -mt-5 relative z-10">
-        <div className="bg-white border-2 border-black rounded-[20px] py-2.5 px-2 flex justify-around shadow-xl">
-          
-          <div className="flex flex-col items-center">
-            <div className="w-11 h-11 rounded-full border-2 border-black bg-white flex items-center justify-center text-xl shadow-sm">
-              💰
-            </div>
-            <span className="font-bold mt-0.5 text-[11px] text-black">DEPOSIT</span>
-          </div>
-
-          <div className="flex flex-col items-center">
-            <div className="w-11 h-11 rounded-full border-2 border-black bg-white flex items-center justify-center text-xl shadow-sm">
-              🏧
-            </div>
-            <span className="font-bold mt-0.5 text-[11px] text-black">WITHDRAW</span>
-          </div>
-
-          <div className="flex flex-col items-center">
-            <div className="w-11 h-11 rounded-full border-2 border-black bg-white flex items-center justify-center text-xl shadow-sm">
-              🟢
-            </div>
-            <span className="font-bold mt-0.5 text-[11px] text-black">WHATSAPP</span>
-          </div>
-
-          <div className="flex flex-col items-center">
-            <div className="w-11 h-11 rounded-full border-2 border-black bg-white flex items-center justify-center text-xl shadow-sm">
-              📺
-            </div>
-            <span className="font-bold mt-0.5 text-[11px] text-black">LIVE CHAT</span>
-          </div>
-
-        </div>
-      </div>
+      {/* Action Buttons Component */}
+      <ActionButtons />
     </div>
   );
 }
+
+function Item({ icon, title }) {
+  return (
+    <div className="flex flex-col items-center">
+      <div className="w-11 h-11 rounded-full border-2 border-black bg-white flex items-center justify-center text-xl shadow-sm">
+        {icon}
+      </div>
+
+      <span className="font-bold mt-0.5 text-[11px] text-black">
+        {title}
+      </span>
+    </div>
+  );
+}
+
+export function ActionButtons() {
+  return (
+    <div className="px-4 -mt-5 relative z-10">
+      <div className="bg-white border-2 border-black rounded-[20px] py-2.5 px-2 flex justify-around shadow-xl">
+        <Item icon="💰" title="DEPOSIT" />
+        <Item icon="🏧" title="WITHDRAW" />
+        <Item icon="🟢" title="WHATSAPP" />
+        <Item icon="📺" title="LIVE CHAT" />
+      </div>
+    </div>
+  );
+    }
