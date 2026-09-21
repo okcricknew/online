@@ -1,6 +1,5 @@
 import { adminDb } from '@/lib/firebaseAdmin';
 import Header from '@/components/Header';
-import ActionButtons from '@/components/ActionButtons';
 import GameCard from '@/components/GameCard';
 import BottomNav from '@/components/BottomNav';
 
@@ -53,7 +52,6 @@ export default async function Home() {
   return (
     <div className="max-w-xl mx-auto relative min-h-screen">
       <Header />
-      <ActionButtons />
       
       <main className="p-4 flex flex-col gap-4">
         {(games.length ? games : demoGames).map((game) => (
