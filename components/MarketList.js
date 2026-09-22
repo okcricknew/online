@@ -1,63 +1,34 @@
-import { adminDb } from '@/lib/firebaseAdmin';
-import GameCard from '@/components/GameCard';
+import 'server-only';
 
-// Yeh function Server-Side data fetch karega (SSR)
-async function getGamesData() {
-  try {
-    const snapshot = await adminDb.collection('games').get();
-    const games = snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
-    return games;
-  } catch (error) {
-    console.error("Error fetching games:", error);
-    return [];
-  }
-}
+import { adminDb } from '@/lib/firebaseAdmin';
+import GameCard from './GameCard';
 
 export default async function MarketList() {
-  const games = await getGamesData();
+  const snapshot = await adminDb
+    .collection('games')
+    .get();
 
-  const demoGames = [
-    {
-      id: 1,
-      title: "LAKSH MORNING",
-      numbers: "346-33-157",
-      status: "CLOSED",
-      openBids: "09:30 AM",
-      closeBids: "10:30 AM",
-    },
-    {
-      id: 2,
-      title: "SANDHYA MORNING",
-      numbers: "170-87-340",
-      status: "CLOSED",
-      openBids: "10:00 AM",
-      closeBids: "11:00 AM",
-    },
-    {
-      id: 3,
-      title: "KUBER DAY",
-      numbers: "***-**-***",
-      status: "RUNNING",
-      isOpen: true,
-      openBids: "03:40 PM",
-      closeBids: "05:40 PM",
-    },
-  ];
+  const games = snapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+  }));
 
-  const listToDisplay = games.length ? games : demoGames;
+  if (!games.length) {
+    return (
+      <div className="rounded-xl bg-white p-6 text-center">
+        No games available right now.
+      </div>
+    );
+  }
 
   return (
-    <>
-      {listToDisplay.map((game) => (
+    <div className="flex flex-col gap-4">
+      {games.map((game) => (
         <GameCard
           key={game.id}
           game={game}
         />
       ))}
-    </>
+    </div>
   );
 }
-
