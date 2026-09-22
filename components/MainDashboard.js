@@ -8,6 +8,7 @@ export default function MainDashboard({
   session,
   error,
   isUnlocked,
+  mpinUnlocked,
 }) {
   const dashboard = (
     <div className="max-w-xl mx-auto relative min-h-screen pb-20 bg-gray-50">
@@ -32,31 +33,25 @@ export default function MainDashboard({
   );
 
   /*
-   * Server-side MPIN lock.
+   * Server-side lock.
    *
-   * Agar app_unlocked cookie nahi hai,
-   * to MPIN screen.
+   * Agar server ke paas app_unlocked cookie nahi hai,
+   * to MPIN screen show hogi.
    */
   if (!isUnlocked) {
     return mpinScreen;
   }
 
   /*
-   * app_unlocked cookie hai.
+   * Server ne MPIN unlock accept kar liya.
    *
-   * Ab client check karega:
-   *
-   * Refresh:
-   *    sessionStorage exists
-   *    => Dashboard
-   *
-   * New app/tab open:
-   *    sessionStorage missing
-   *    => MPIN
+   * mpinUnlocked = 1 sirf successful MPIN verification
+   * ke turant baad aata hai.
    */
   return (
     <AppSessionGuard
       lockedContent={mpinScreen}
+      unlockOnMount={mpinUnlocked}
     >
       {dashboard}
     </AppSessionGuard>
