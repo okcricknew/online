@@ -1,16 +1,28 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+
 import MainDashboard from '@/components/MainDashboard';
+import { getCurrentSession } from '@/lib/auth';
 
-export default async function Page() {
+export const dynamic = 'force-dynamic';
+
+export default async function Page({ searchParams }) {
+  const params = await searchParams;
+
   const cookieStore = await cookies();
-  const token = cookieStore.get('auth_token');
 
-  // Agar user logged-in nahi hai, toh login page par bhej do
-  if (!token) {
+  const session = await getCurrentSession(
+    cookieStore
+  );
+
+  if (!session) {
     redirect('/login');
   }
 
-  // Agar logged-in hai, toh MainDashboard (MPIN + Header + Market List) render karo
-  return <MainDashboard />;
-    }
+  return (
+    <MainDashboard
+      session={session}
+      error={params?.error}
+    />
+  );
+}
