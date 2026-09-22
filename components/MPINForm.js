@@ -40,7 +40,8 @@ export default function MPINForm({
             maxLength={4}
             minLength={4}
             autoFocus
-            autoComplete="off"
+            autoComplete="one-time-code"
+            data-lpignore="true"
             placeholder="••••"
             required
             className="w-full border-2 border-gray-300 rounded-lg p-4 text-center text-2xl tracking-[0.5em]"
