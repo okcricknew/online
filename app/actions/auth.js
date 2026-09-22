@@ -497,19 +497,17 @@ export async function verifyMpin(
   // MPIN correct.
   // Current app unlock.
   cookieStore.set(
-    'app_unlocked',
-    '1',
-    {
-      httpOnly: true,
-      secure:
-        process.env.NODE_ENV ===
-        'production',
-      sameSite: 'lax',
-      path: '/',
-      maxAge:
-        60 * 60,
-    }
-  );
+  'app_unlocked',
+  '1',
+  {
+    httpOnly: true,
+    secure:
+      process.env.NODE_ENV ===
+      'production',
+    sameSite: 'lax',
+    path: '/',
+  }
+);
 
   redirect('/');
 }
