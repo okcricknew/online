@@ -10,6 +10,11 @@ import {
   getCurrentSession,
 } from '@/lib/auth';
 
+
+// ========================================
+// LOGIN
+// ========================================
+
 export async function login(formData) {
   const mobile = String(
     formData.get('mobile') || ''
@@ -20,7 +25,9 @@ export async function login(formData) {
   );
 
   if (!mobile || !password) {
-    redirect('/login?error=Please fill all fields');
+    redirect(
+      '/login?error=Please fill all fields'
+    );
   }
 
   const snapshot = await adminDb
@@ -30,11 +37,19 @@ export async function login(formData) {
     .get();
 
   if (snapshot.empty) {
-    redirect('/login?error=Invalid login details');
+    redirect(
+      '/login?error=Invalid login details'
+    );
   }
 
   const userDoc = snapshot.docs[0];
   const user = userDoc.data();
+
+  if (!user.passwordHash) {
+    redirect(
+      '/login?error=Invalid login details'
+    );
+  }
 
   const passwordValid = await bcrypt.compare(
     password,
@@ -42,14 +57,20 @@ export async function login(formData) {
   );
 
   if (!passwordValid) {
-    redirect('/login?error=Invalid login details');
+    redirect(
+      '/login?error=Invalid login details'
+    );
   }
 
   if (user.active === false) {
-    redirect('/login?error=Account disabled');
+    redirect(
+      '/login?error=Account disabled'
+    );
   }
 
-  const sessionId = await createSession(userDoc.id);
+  const sessionId = await createSession(
+    userDoc.id
+  );
 
   const cookieStore = await cookies();
 
@@ -61,9 +82,16 @@ export async function login(formData) {
     maxAge: 60 * 60 * 24 * 30,
   });
 
+  // Login ke baad dashboard.
+  // Agar MPIN verified nahi hai to dashboard
+  // automatically MPIN screen dikhayega.
   redirect('/');
 }
 
+
+// ========================================
+// REGISTER
+// ========================================
 
 export async function register(formData) {
   const fullName = String(
@@ -93,6 +121,7 @@ export async function register(formData) {
     );
   }
 
+  // Check mobile
   const mobileCheck = await adminDb
     .collection('users')
     .where('mobile', '==', mobile)
@@ -105,6 +134,7 @@ export async function register(formData) {
     );
   }
 
+  // Check username
   const usernameCheck = await adminDb
     .collection('users')
     .where('username', '==', username)
@@ -117,11 +147,13 @@ export async function register(formData) {
     );
   }
 
+  // Hash password
   const passwordHash = await bcrypt.hash(
     password,
     12
   );
 
+  // Create user
   const userRef = adminDb
     .collection('users')
     .doc();
@@ -132,17 +164,21 @@ export async function register(formData) {
     mobile,
     passwordHash,
 
+    // MPIN abhi create nahi hua
     mpinHash: null,
 
     active: true,
     notificationsEnabled: true,
+
     createdAt: new Date(),
   });
 
+  // Create session
   const sessionId = await createSession(
     userRef.id
   );
 
+  // Save session cookie
   const cookieStore = await cookies();
 
   cookieStore.set('auth_token', sessionId, {
@@ -153,9 +189,14 @@ export async function register(formData) {
     maxAge: 60 * 60 * 24 * 30,
   });
 
+  // New user ko directly MPIN setup par bhejo
   redirect('/setup-mpin');
 }
 
+
+// ========================================
+// SET MPIN
+// ========================================
 
 export async function setMpin(formData) {
   const mpin = String(
@@ -166,34 +207,80 @@ export async function setMpin(formData) {
     formData.get('confirmMpin') || ''
   ).trim();
 
+  // Empty check
   if (!mpin || !confirmMpin) {
     redirect(
       '/setup-mpin?error=Please fill both fields'
     );
   }
 
+  // 4 digit check
   if (!/^\d{4}$/.test(mpin)) {
     redirect(
       '/setup-mpin?error=MPIN must be 4 digits'
     );
   }
 
+  // Match check
   if (mpin !== confirmMpin) {
     redirect(
       '/setup-mpin?error=MPINs do not match'
     );
   }
 
+  // Get auth cookie
   const cookieStore = await cookies();
 
-  const session = await getCurrentSession(
-    cookieStore
+  const authCookie = cookieStore.get(
+    'auth_token'
   );
 
-  if (!session) {
+  if (!authCookie?.value) {
     redirect('/login');
   }
 
+  const sessionId = authCookie.value;
+
+  // Directly get session
+  const sessionRef = adminDb
+    .collection('sessions')
+    .doc(sessionId);
+
+  const sessionSnap = await sessionRef.get();
+
+  if (!sessionSnap.exists) {
+    cookieStore.delete('auth_token');
+    redirect('/login');
+  }
+
+  const session = sessionSnap.data();
+
+  if (!session?.userId) {
+    cookieStore.delete('auth_token');
+    redirect('/login');
+  }
+
+  // Check session expiry safely
+  if (session.expiresAt) {
+    const expiresAt =
+      typeof session.expiresAt.toDate === 'function'
+        ? session.expiresAt.toDate()
+        : new Date(session.expiresAt);
+
+    if (
+      expiresAt instanceof Date &&
+      !Number.isNaN(expiresAt.getTime()) &&
+      expiresAt < new Date()
+    ) {
+      await sessionRef.delete();
+
+      cookieStore.delete('auth_token');
+
+      redirect('/login');
+    }
+  }
+
+  // Get user
   const userRef = adminDb
     .collection('users')
     .doc(session.userId);
@@ -201,29 +288,35 @@ export async function setMpin(formData) {
   const userSnap = await userRef.get();
 
   if (!userSnap.exists) {
+    cookieStore.delete('auth_token');
     redirect('/login');
   }
 
+  // Hash MPIN
   const mpinHash = await bcrypt.hash(
     mpin,
     12
   );
 
+  // Save MPIN
   await userRef.update({
-    mpinHash,
+    mpinHash: mpinHash,
   });
 
-  await adminDb
-    .collection('sessions')
-    .doc(session.sessionId)
-    .update({
-      mpinVerified: true,
-      mpinVerifiedAt: new Date(),
-    });
+  // Mark current session as verified
+  await sessionRef.update({
+    mpinVerified: true,
+    mpinVerifiedAt: new Date(),
+  });
 
+  // Dashboard
   redirect('/');
 }
 
+
+// ========================================
+// VERIFY MPIN
+// ========================================
 
 export async function verifyMpin(formData) {
   const mpin = String(
@@ -236,29 +329,54 @@ export async function verifyMpin(formData) {
 
   const cookieStore = await cookies();
 
-  const session = await getCurrentSession(
-    cookieStore
+  const authCookie = cookieStore.get(
+    'auth_token'
   );
 
-  if (!session) {
+  if (!authCookie?.value) {
     redirect('/login');
   }
 
+  const sessionId = authCookie.value;
+
+  // Get session directly
+  const sessionRef = adminDb
+    .collection('sessions')
+    .doc(sessionId);
+
+  const sessionSnap = await sessionRef.get();
+
+  if (!sessionSnap.exists) {
+    cookieStore.delete('auth_token');
+    redirect('/login');
+  }
+
+  const session = sessionSnap.data();
+
+  if (!session?.userId) {
+    cookieStore.delete('auth_token');
+    redirect('/login');
+  }
+
+  // Get user
   const userSnap = await adminDb
     .collection('users')
     .doc(session.userId)
     .get();
 
   if (!userSnap.exists) {
+    cookieStore.delete('auth_token');
     redirect('/login');
   }
 
   const user = userSnap.data();
 
+  // MPIN not created
   if (!user.mpinHash) {
     redirect('/setup-mpin');
   }
 
+  // Compare MPIN
   const valid = await bcrypt.compare(
     mpin,
     user.mpinHash
@@ -268,27 +386,31 @@ export async function verifyMpin(formData) {
     redirect('/?error=Invalid MPIN');
   }
 
-  await adminDb
-    .collection('sessions')
-    .doc(session.sessionId)
-    .update({
-      mpinVerified: true,
-      mpinVerifiedAt: new Date(),
-    });
+  // Verify session
+  await sessionRef.update({
+    mpinVerified: true,
+    mpinVerifiedAt: new Date(),
+  });
 
   redirect('/');
 }
 
 
+// ========================================
+// LOGOUT
+// ========================================
+
 export async function logout() {
   const cookieStore = await cookies();
 
-  const cookie = cookieStore.get('auth_token');
+  const authCookie = cookieStore.get(
+    'auth_token'
+  );
 
-  if (cookie?.value) {
+  if (authCookie?.value) {
     await adminDb
       .collection('sessions')
-      .doc(cookie.value)
+      .doc(authCookie.value)
       .delete();
   }
 
@@ -297,6 +419,10 @@ export async function logout() {
   redirect('/login');
 }
 
+
+// ========================================
+// TOGGLE NOTIFICATIONS
+// ========================================
 
 export async function toggleNotifications() {
   const cookieStore = await cookies();
