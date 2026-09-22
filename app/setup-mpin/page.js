@@ -9,10 +9,9 @@ export default async function SetupMpinPage({
   const params = searchParams || {};
 
   const error = params.error;
+  const completed = params.completed === '1';
 
-  const completed =
-    params.completed === '1';
-
+  // MPIN successfully created
   if (completed) {
     return <MpinSetupComplete />;
   }
@@ -39,7 +38,6 @@ export default async function SetupMpinPage({
           action={setMpin}
           className="space-y-4"
         >
-
           <input
             name="mpin"
             type="password"
@@ -72,7 +70,6 @@ export default async function SetupMpinPage({
           >
             SET MPIN
           </button>
-
         </form>
 
       </div>
