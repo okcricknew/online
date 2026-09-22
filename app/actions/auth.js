@@ -11,8 +11,13 @@ import {
 } from '@/lib/auth';
 
 export async function login(formData) {
-  const mobile = String(formData.get('mobile') || '').trim();
-  const password = String(formData.get('password') || '');
+  const mobile = String(
+    formData.get('mobile') || ''
+  ).trim();
+
+  const password = String(
+    formData.get('password') || ''
+  );
 
   if (!mobile || !password) {
     redirect('/login?error=Please fill all fields');
@@ -59,6 +64,7 @@ export async function login(formData) {
   redirect('/');
 }
 
+
 export async function register(formData) {
   const fullName = String(
     formData.get('fullName') || ''
@@ -76,25 +82,14 @@ export async function register(formData) {
     formData.get('password') || ''
   );
 
-  const mpin = String(
-    formData.get('mpin') || ''
-  );
-
   if (
     !fullName ||
     !username ||
     !mobile ||
-    !password ||
-    !mpin
+    !password
   ) {
     redirect(
       '/login?mode=register&error=Please fill all fields'
-    );
-  }
-
-  if (!/^\d{4}$/.test(mpin)) {
-    redirect(
-      '/login?mode=register&error=MPIN must be 4 digits'
     );
   }
 
@@ -122,23 +117,31 @@ export async function register(formData) {
     );
   }
 
-  const passwordHash = await bcrypt.hash(password, 12);
-  const mpinHash = await bcrypt.hash(mpin, 12);
+  const passwordHash = await bcrypt.hash(
+    password,
+    12
+  );
 
-  const userRef = adminDb.collection('users').doc();
+  const userRef = adminDb
+    .collection('users')
+    .doc();
 
   await userRef.set({
     fullName,
     username,
     mobile,
     passwordHash,
-    mpinHash,
+
+    mpinHash: null,
+
     active: true,
     notificationsEnabled: true,
     createdAt: new Date(),
   });
 
-  const sessionId = await createSession(userRef.id);
+  const sessionId = await createSession(
+    userRef.id
+  );
 
   const cookieStore = await cookies();
 
@@ -150,8 +153,77 @@ export async function register(formData) {
     maxAge: 60 * 60 * 24 * 30,
   });
 
+  redirect('/setup-mpin');
+}
+
+
+export async function setMpin(formData) {
+  const mpin = String(
+    formData.get('mpin') || ''
+  ).trim();
+
+  const confirmMpin = String(
+    formData.get('confirmMpin') || ''
+  ).trim();
+
+  if (!mpin || !confirmMpin) {
+    redirect(
+      '/setup-mpin?error=Please fill both fields'
+    );
+  }
+
+  if (!/^\d{4}$/.test(mpin)) {
+    redirect(
+      '/setup-mpin?error=MPIN must be 4 digits'
+    );
+  }
+
+  if (mpin !== confirmMpin) {
+    redirect(
+      '/setup-mpin?error=MPINs do not match'
+    );
+  }
+
+  const cookieStore = await cookies();
+
+  const session = await getCurrentSession(
+    cookieStore
+  );
+
+  if (!session) {
+    redirect('/login');
+  }
+
+  const userRef = adminDb
+    .collection('users')
+    .doc(session.userId);
+
+  const userSnap = await userRef.get();
+
+  if (!userSnap.exists) {
+    redirect('/login');
+  }
+
+  const mpinHash = await bcrypt.hash(
+    mpin,
+    12
+  );
+
+  await userRef.update({
+    mpinHash,
+  });
+
+  await adminDb
+    .collection('sessions')
+    .doc(session.sessionId)
+    .update({
+      mpinVerified: true,
+      mpinVerifiedAt: new Date(),
+    });
+
   redirect('/');
 }
+
 
 export async function verifyMpin(formData) {
   const mpin = String(
@@ -164,7 +236,9 @@ export async function verifyMpin(formData) {
 
   const cookieStore = await cookies();
 
-  const session = await getCurrentSession(cookieStore);
+  const session = await getCurrentSession(
+    cookieStore
+  );
 
   if (!session) {
     redirect('/login');
@@ -180,6 +254,10 @@ export async function verifyMpin(formData) {
   }
 
   const user = userSnap.data();
+
+  if (!user.mpinHash) {
+    redirect('/setup-mpin');
+  }
 
   const valid = await bcrypt.compare(
     mpin,
@@ -201,6 +279,7 @@ export async function verifyMpin(formData) {
   redirect('/');
 }
 
+
 export async function logout() {
   const cookieStore = await cookies();
 
@@ -218,10 +297,13 @@ export async function logout() {
   redirect('/login');
 }
 
+
 export async function toggleNotifications() {
   const cookieStore = await cookies();
 
-  const session = await getCurrentSession(cookieStore);
+  const session = await getCurrentSession(
+    cookieStore
+  );
 
   if (!session) {
     redirect('/login');
