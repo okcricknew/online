@@ -7,23 +7,30 @@ import { getCurrentSession } from '@/lib/auth';
 export const dynamic = 'force-dynamic';
 
 export default async function Page({
-  searchParams,
+  searchParams = {},
 }) {
-  const params = searchParams || {};
-
-  const cookieStore = await cookies();
+  const cookieStore = cookies();
 
   const session =
-    await getCurrentSession(cookieStore);
+    await getCurrentSession(
+      cookieStore
+    );
 
   if (!session) {
     redirect('/login');
   }
 
+  const unlockedCookie =
+    cookieStore.get('app_unlocked');
+
+  const isUnlocked =
+    unlockedCookie?.value === '1';
+
   return (
     <MainDashboard
       session={session}
-      error={params.error}
+      error={searchParams?.error}
+      isUnlocked={isUnlocked}
     />
   );
 }
