@@ -6,14 +6,15 @@ import { getCurrentSession } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
-export default async function Page({ searchParams }) {
-  const params = await searchParams;
+export default async function Page({
+  searchParams,
+}) {
+  const params = searchParams || {};
 
   const cookieStore = await cookies();
 
-  const session = await getCurrentSession(
-    cookieStore
-  );
+  const session =
+    await getCurrentSession(cookieStore);
 
   if (!session) {
     redirect('/login');
@@ -22,7 +23,7 @@ export default async function Page({ searchParams }) {
   return (
     <MainDashboard
       session={session}
-      error={params?.error}
+      error={params.error}
     />
   );
 }
