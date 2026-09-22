@@ -1,4 +1,5 @@
 import { setMpin } from '@/app/actions/auth';
+import MpinSetupComplete from '@/components/MpinSetupComplete';
 
 export const dynamic = 'force-dynamic';
 
@@ -8,6 +9,13 @@ export default async function SetupMpinPage({
   const params = searchParams || {};
 
   const error = params.error;
+
+  const completed =
+    params.completed === '1';
+
+  if (completed) {
+    return <MpinSetupComplete />;
+  }
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
