@@ -1,199 +1,144 @@
-'use client';
+import Link from 'next/link';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import {
+  login,
+  register,
+} from '@/app/actions/auth';
 
-export default function LoginPage() {
-  const [isLoginTab, setIsLoginTab] = useState(true); // true = Login, false = Register
-  const [step, setStep] = useState('form'); // 'form' ya 'create_mpin'
+export const dynamic = 'force-dynamic';
 
-  // Form States
-  const [formData, setFormData] = useState({
-    fullName: '',
-    username: '',
-    mobile: '',
-    password: '',
-  });
-  const [mpin, setMpin] = useState(['', '', '', '']);
-  const router = useRouter();
+export default async function LoginPage({
+  searchParams,
+}) {
+  const params = await searchParams;
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const registerMode =
+    params?.mode === 'register';
 
-  const handleMpinChange = (value, index) => {
-    if (isNaN(value)) return;
-    let newMpin = [...mpin];
-    newMpin[index] = value;
-    setMpin(newMpin);
-
-    if (value && index < 3) {
-      const nextInput = document.getElementById(`reg-mpin-${index + 1}`);
-      if (nextInput) nextInput.focus();
-    }
-  };
-
-  // Step 1: Form Submit hone par
-  const handleFormSubmit = (e) => {
-    e.preventDefault();
-    if (!isLoginTab) {
-      // Agar Register hai, toh pehle details lo phir MPIN create karne ke step par bhejo
-      if (!formData.fullName || !formData.username || !formData.mobile || !formData.password) {
-        alert('Kripya sabhi fields bharein.');
-        return;
-      }
-      setStep('create_mpin'); // Move to MPIN creation step
-    } else {
-      // Login Logic
-      if (!formData.mobile || !formData.password) {
-        alert('Mobile aur Password darj karein.');
-        return;
-      }
-      // Cookie set karke app unlock screen pe bhej do
-      document.cookie = "auth_token=logged_in_user; path=/; max-age=" + 60*60*24*30;
-      router.push('/');
-    }
-  };
-
-  // Step 2: Register ke baad MPIN save karne ka action
-  const handleSaveMpinAndRegister = () => {
-    const finalMpin = mpin.join('');
-    if (finalMpin.length !== 4) {
-      alert('Kripya pura 4-digit MPIN darj karein.');
-      return;
-    }
-    // Database me save karne ke baad session cookie set karein
-    document.cookie = "auth_token=logged_in_user; path=/; max-age=" + 60*60*24*30;
-    document.cookie = `user_mpin=${finalMpin}; path=/; max-age=` + 60*60*24*30;
-    
-    alert('Account successfully ban gaya aur MPIN set ho gaya!');
-    router.push('/');
-  };
+  const error = params?.error;
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-[#18a4e0] px-4">
-      <div className="bg-white text-black p-6 rounded-[30px] shadow-2xl w-full max-w-sm border-2 border-black">
-        
-        <div className="text-center mb-4">
-          <h1 className="text-3xl font-black">
-            Laksh<span className="text-[#18a4e0]">365</span>
-          </h1>
-          <p className="text-gray-600 text-xs mt-1 font-semibold">
-            {step === 'create_mpin' ? 'Apna 4-Digit Security MPIN Banayein' : (isLoginTab ? 'Apne account me Login karein' : 'Naya Account Register karein')}
-          </p>
+    <main className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-6">
+
+        <h1 className="text-2xl font-bold text-center mb-6">
+          LAKSH365
+        </h1>
+
+        <div className="flex mb-6 border-b">
+          <Link
+            href="/login"
+            className={`flex-1 text-center py-3 font-semibold ${
+              !registerMode
+                ? 'border-b-2 border-black'
+                : ''
+            }`}
+          >
+            LOGIN
+          </Link>
+
+          <Link
+            href="/login?mode=register"
+            className={`flex-1 text-center py-3 font-semibold ${
+              registerMode
+                ? 'border-b-2 border-black'
+                : ''
+            }`}
+          >
+            REGISTER
+          </Link>
         </div>
 
-        {/* Agar MPIN creation step par hai */}
-        {step === 'create_mpin' ? (
-          <div className="flex flex-col items-center">
-            <div className="flex justify-center gap-3 my-4">
-              {mpin.map((digit, index) => (
-                <input
-                  key={index}
-                  id={`reg-mpin-${index}`}
-                  type="password"
-                  maxLength={1}
-                  value={digit}
-                  onChange={(e) => handleMpinChange(e.target.value, index)}
-                  className="w-12 h-12 text-center text-2xl font-bold border-2 border-black rounded-xl focus:outline-none bg-gray-50"
-                />
-              ))}
-            </div>
-            <button 
-              onClick={handleSaveMpinAndRegister}
-              className="w-full bg-[#18a4e0] text-white border-2 border-black rounded-full py-3 font-black text-lg shadow-md mt-2 cursor-pointer"
-            >
-              SAVE MPIN & CONTINUE
-            </button>
+        {error && (
+          <div className="mb-4 rounded-lg bg-red-50 text-red-600 p-3 text-sm">
+            {error}
           </div>
+        )}
+
+        {!registerMode ? (
+          <form action={login} className="space-y-4">
+
+            <input
+              name="mobile"
+              type="tel"
+              placeholder="Mobile Number"
+              required
+              className="w-full border rounded-lg p-3"
+            />
+
+            <input
+              name="password"
+              type="password"
+              placeholder="Password"
+              required
+              className="w-full border rounded-lg p-3"
+            />
+
+            <button
+              type="submit"
+              className="w-full rounded-lg bg-black text-white p-3 font-semibold"
+            >
+              LOGIN
+            </button>
+
+          </form>
         ) : (
-          /* Normal Login / Register Form */
-          <>
-            {/* Tabs */}
-            <div className="flex border-2 border-black rounded-full overflow-hidden mb-4 bg-gray-100">
-              <button 
-                type="button"
-                onClick={() => setIsLoginTab(true)}
-                className={`w-1/2 py-2 font-bold text-sm transition-colors cursor-pointer ${isLoginTab ? 'bg-[#18a4e0] text-white' : 'text-black'}`}
-              >
-                LOGIN
-              </button>
-              <button 
-                type="button"
-                onClick={() => setIsLoginTab(false)}
-                className={`w-1/2 py-2 font-bold text-sm transition-colors cursor-pointer ${!isLoginTab ? 'bg-[#18a4e0] text-white' : 'text-black'}`}
-              >
-                REGISTER
-              </button>
-            </div>
+          <form action={register} className="space-y-4">
 
-            <form onSubmit={handleFormSubmit} className="flex flex-col gap-3">
-              {!isLoginTab && (
-                <>
-                  <div>
-                    <label className="block text-[11px] font-bold mb-0.5">FULL NAME</label>
-                    <input 
-                      type="text" 
-                      name="fullName" 
-                      value={formData.fullName} 
-                      onChange={handleChange}
-                      placeholder="Enter full name" 
-                      className="w-full px-3 py-2 border-2 border-black rounded-xl text-xs font-semibold bg-gray-50 outline-none"
-                    />
-                  </div>
+            <input
+              name="fullName"
+              type="text"
+              placeholder="Full Name"
+              required
+              className="w-full border rounded-lg p-3"
+            />
 
-                  <div>
-                    <label className="block text-[11px] font-bold mb-0.5">USER NAME</label>
-                    <input 
-                      type="text" 
-                      name="username" 
-                      value={formData.username} 
-                      onChange={handleChange}
-                      placeholder="Choose a username" 
-                      className="w-full px-3 py-2 border-2 border-black rounded-xl text-xs font-semibold bg-gray-50 outline-none"
-                    />
-                  </div>
-                </>
-              )}
+            <input
+              name="username"
+              type="text"
+              placeholder="Username"
+              required
+              className="w-full border rounded-lg p-3"
+            />
 
-              <div>
-                <label className="block text-[11px] font-bold mb-0.5">MOBILE NUMBER</label>
-                <input 
-                  type="tel" 
-                  name="mobile" 
-                  value={formData.mobile} 
-                  onChange={handleChange}
-                  required 
-                  placeholder="10 digit mobile number" 
-                  className="w-full px-3 py-2 border-2 border-black rounded-xl text-xs font-semibold bg-gray-50 outline-none"
-                />
-              </div>
+            <input
+              name="mobile"
+              type="tel"
+              placeholder="Mobile Number"
+              required
+              className="w-full border rounded-lg p-3"
+            />
 
-              <div>
-                <label className="block text-[11px] font-bold mb-0.5">PASSWORD</label>
-                <input 
-                  type="password" 
-                  name="password" 
-                  value={formData.password} 
-                  onChange={handleChange}
-                  required 
-                  placeholder="Enter password" 
-                  className="w-full px-3 py-2 border-2 border-black rounded-xl text-xs font-semibold bg-gray-50 outline-none"
-                />
-              </div>
+            <input
+              name="password"
+              type="password"
+              placeholder="Password"
+              required
+              className="w-full border rounded-lg p-3"
+            />
 
-              <button 
-                type="submit"
-                className="w-full bg-[#18a4e0] text-white border-2 border-black rounded-full py-3 font-black text-base shadow-md mt-2 cursor-pointer active:scale-95 transition-transform"
-              >
-                {isLoginTab ? 'LOGIN' : 'NEXT: CREATE MPIN'}
-              </button>
-            </form>
-          </>
+            <input
+              name="mpin"
+              type="password"
+              inputMode="numeric"
+              pattern="[0-9]{4}"
+              maxLength={4}
+              placeholder="4 Digit MPIN"
+              required
+              className="w-full border rounded-lg p-3"
+            />
+
+            <button
+              type="submit"
+              className="w-full rounded-lg bg-black text-white p-3 font-semibold"
+            >
+              CREATE ACCOUNT
+            </button>
+
+          </form>
         )}
 
       </div>
-    </div>
+    </main>
   );
 }
-
