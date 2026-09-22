@@ -21,7 +21,9 @@ export default async function Page({
   }
 
   const unlockedCookie =
-    cookieStore.get('app_unlocked');
+    cookieStore.get(
+      'app_unlocked'
+    );
 
   const isUnlocked =
     unlockedCookie?.value === '1';
