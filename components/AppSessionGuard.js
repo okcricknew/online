@@ -7,19 +7,18 @@ export default function AppSessionGuard({
   lockedContent,
 }) {
   const [checking, setChecking] = useState(true);
-  const [isNewOpen, setIsNewOpen] = useState(false);
+  const [isUnlocked, setIsUnlocked] = useState(false);
 
   useEffect(() => {
-    const key = 'laksh365_app_open';
+    const key = 'laksh365_mpin_unlocked';
 
-    const alreadyOpen =
+    const unlocked =
       sessionStorage.getItem(key);
 
-    if (alreadyOpen === '1') {
-      setIsNewOpen(false);
+    if (unlocked === '1') {
+      setIsUnlocked(true);
     } else {
-      sessionStorage.setItem(key, '1');
-      setIsNewOpen(true);
+      setIsUnlocked(false);
     }
 
     setChecking(false);
@@ -35,7 +34,7 @@ export default function AppSessionGuard({
     );
   }
 
-  if (isNewOpen) {
+  if (!isUnlocked) {
     return lockedContent;
   }
 
