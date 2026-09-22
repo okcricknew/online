@@ -513,7 +513,7 @@ export async function verifyMpin(
   }
 );
 
-  redirect('/');
+redirect('/setup-mpin?completed=1');
 }
 
 
