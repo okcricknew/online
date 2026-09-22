@@ -6,15 +6,23 @@ import MPINForm from '@/components/MPINForm';
 export default function MainDashboard({
   session,
   error,
+  isUnlocked,
 }) {
-  if (!session.mpinVerified) {
-    return <MPINForm error={error} />;
+
+  if (!isUnlocked) {
+    return (
+      <MPINForm
+        error={error}
+      />
+    );
   }
 
   return (
     <div className="max-w-xl mx-auto relative min-h-screen pb-20 bg-gray-50">
 
-      <Header session={session} />
+      <Header
+        session={session}
+      />
 
       <main className="p-4 flex flex-col gap-4">
         <MarketList />
