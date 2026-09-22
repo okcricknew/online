@@ -10,12 +10,14 @@ export const dynamic = 'force-dynamic';
 export default async function LoginPage({
   searchParams,
 }) {
-  const params = await searchParams;
+  // Next.js ke current behavior ke liye
+  // searchParams ko safely handle karo.
+  const params = searchParams || {};
 
   const registerMode =
-    params?.mode === 'register';
+    params.mode === 'register';
 
-  const error = params?.error;
+  const error = params.error;
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
@@ -26,6 +28,7 @@ export default async function LoginPage({
         </h1>
 
         <div className="flex mb-6 border-b">
+
           <Link
             href="/login"
             className={`flex-1 text-center py-3 font-semibold ${
@@ -47,6 +50,7 @@ export default async function LoginPage({
           >
             REGISTER
           </Link>
+
         </div>
 
         {error && (
@@ -56,7 +60,11 @@ export default async function LoginPage({
         )}
 
         {!registerMode ? (
-          <form action={login} className="space-y-4">
+
+          <form
+            action={login}
+            className="space-y-4"
+          >
 
             <input
               name="mobile"
@@ -82,8 +90,13 @@ export default async function LoginPage({
             </button>
 
           </form>
+
         ) : (
-          <form action={register} className="space-y-4">
+
+          <form
+            action={register}
+            className="space-y-4"
+          >
 
             <input
               name="fullName"
@@ -125,6 +138,7 @@ export default async function LoginPage({
             </button>
 
           </form>
+
         )}
 
       </div>
