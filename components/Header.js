@@ -7,14 +7,15 @@ export default function Header({ session }) {
   return (
     <div className="sticky top-0 z-50 bg-gray-100 pb-1">
 
-      {/* Blue Header Section */}
       <div className="bg-[#18a4e0] text-white shadow-md rounded-b-[30px] pb-5">
 
-        {/* Top Header Row */}
         <div className="flex justify-between items-center px-4 pt-2.5 pb-1">
 
           <div className="flex items-center gap-2.5">
-            <span className="text-2xl">☰</span>
+
+            <span className="text-2xl">
+              ☰
+            </span>
 
             <h1 className="text-3xl font-black">
               Laksh
@@ -22,43 +23,44 @@ export default function Header({ session }) {
                 365
               </span>
             </h1>
+
           </div>
 
           <div className="flex items-center gap-2">
 
             <div className="bg-black rounded-full px-3 py-1.5 text-lg font-bold flex items-center gap-1.5 shadow-inner">
-              <span className="text-sm">👛</span>
+              <span className="text-sm">
+                👛
+              </span>
+
               ₹0.00
             </div>
 
-            {/* Notification */}
             <form action={toggleNotifications}>
+
               <button
                 type="submit"
-                className={`w-9 h-9 rounded-full flex items-center justify-center shadow-inner text-sm transition-all duration-200 cursor-pointer ${
+                className={`w-9 h-9 rounded-full flex items-center justify-center shadow-inner text-sm ${
                   isNotificationsOn
                     ? 'bg-black text-white'
                     : 'bg-gray-800 text-gray-400 opacity-80'
                 }`}
-                title={
-                  isNotificationsOn
-                    ? 'Notifications ON'
-                    : 'Notifications OFF'
-                }
               >
-                {isNotificationsOn ? '🔔' : '🔕'}
+                {isNotificationsOn
+                  ? '🔔'
+                  : '🔕'}
               </button>
+
             </form>
 
           </div>
+
         </div>
 
-        {/* Welcome Text */}
         <div className="px-3 py-0.5 overflow-hidden whitespace-nowrap font-bold text-xs">
           WELCOME TO LAKSH365, ARISE, AWAKE AND STOP NOT UNTIL THE GOAL IS ACHIEVED
         </div>
 
-        {/* Starline / Jackpot */}
         <div className="grid grid-cols-2 gap-2.5 px-4 pt-2 pb-1">
 
           <button
@@ -76,9 +78,9 @@ export default function Header({ session }) {
           </button>
 
         </div>
+
       </div>
 
-      {/* Action Buttons */}
       <ActionButtons />
 
     </div>
@@ -109,13 +111,28 @@ export function ActionButtons() {
 
       <div className="bg-white border-2 border-black rounded-[20px] py-2.5 px-2 flex justify-around shadow-xl">
 
-        <Item icon="💰" title="DEPOSIT" />
-        <Item icon="🏧" title="WITHDRAW" />
-        <Item icon="🟢" title="WHATSAPP" />
-        <Item icon="📺" title="LIVE CHAT" />
+        <Item
+          icon="💰"
+          title="DEPOSIT"
+        />
+
+        <Item
+          icon="🏧"
+          title="WITHDRAW"
+        />
+
+        <Item
+          icon="🟢"
+          title="WHATSAPP"
+        />
+
+        <Item
+          icon="📺"
+          title="LIVE CHAT"
+        />
 
       </div>
 
     </div>
   );
-}
+    }
