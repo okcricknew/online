@@ -117,17 +117,6 @@ export default async function LoginPage({
               className="w-full border rounded-lg p-3"
             />
 
-            <input
-              name="mpin"
-              type="password"
-              inputMode="numeric"
-              pattern="[0-9]{4}"
-              maxLength={4}
-              placeholder="4 Digit MPIN"
-              required
-              className="w-full border rounded-lg p-3"
-            />
-
             <button
               type="submit"
               className="w-full rounded-lg bg-black text-white p-3 font-semibold"
