@@ -33,7 +33,7 @@ export default function Header({ session }) {
                 👛
               </span>
 
-              ₹0.00
+              ₹500000
             </div>
 
             <form action={toggleNotifications}>
