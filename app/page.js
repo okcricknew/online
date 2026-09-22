@@ -28,11 +28,15 @@ export default async function Page({
   const isUnlocked =
     unlockedCookie?.value === '1';
 
+  const mpinUnlocked =
+    searchParams?.mpin_unlocked === '1';
+
   return (
     <MainDashboard
       session={session}
       error={searchParams?.error}
       isUnlocked={isUnlocked}
+      mpinUnlocked={mpinUnlocked}
     />
   );
 }
