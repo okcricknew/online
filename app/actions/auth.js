@@ -391,7 +391,7 @@ export async function setMpin(
   }
 );
 
-  redirect('/');
+redirect('/setup-mpin?completed=1');
 }
 
 
@@ -513,7 +513,7 @@ export async function verifyMpin(
   }
 );
 
-redirect('/setup-mpin?completed=1');
+redirect('/');
 }
 
 
