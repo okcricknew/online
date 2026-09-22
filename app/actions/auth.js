@@ -499,8 +499,8 @@ export async function verifyMpin(
   }
 
   // MPIN correct.
-  // Current app unlock.
-  cookieStore.set(
+// Server-side unlock.
+cookieStore.set(
   'app_unlocked',
   '1',
   {
@@ -513,7 +513,8 @@ export async function verifyMpin(
   }
 );
 
-redirect('/');
+// Tell the client that MPIN was successfully verified.
+redirect('/?mpin_unlocked=1');
 }
 
 
