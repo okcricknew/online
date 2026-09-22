@@ -1,10 +1,13 @@
 import { setMpin } from '@/app/actions/auth';
 
+export const dynamic = 'force-dynamic';
+
 export default async function SetupMpinPage({
   searchParams,
 }) {
-  const params = await searchParams;
-  const error = params?.error;
+  const params = searchParams || {};
+
+  const error = params.error;
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
@@ -24,7 +27,10 @@ export default async function SetupMpinPage({
           </div>
         )}
 
-        <form action={setMpin} className="space-y-4">
+        <form
+          action={setMpin}
+          className="space-y-4"
+        >
 
           <input
             name="mpin"
@@ -32,8 +38,10 @@ export default async function SetupMpinPage({
             inputMode="numeric"
             pattern="[0-9]{4}"
             maxLength={4}
+            minLength={4}
             placeholder="Enter MPIN"
             required
+            autoComplete="new-password"
             className="w-full border rounded-lg p-4 text-center text-2xl tracking-[0.5em]"
           />
 
@@ -43,8 +51,10 @@ export default async function SetupMpinPage({
             inputMode="numeric"
             pattern="[0-9]{4}"
             maxLength={4}
+            minLength={4}
             placeholder="Confirm MPIN"
             required
+            autoComplete="new-password"
             className="w-full border rounded-lg p-4 text-center text-2xl tracking-[0.5em]"
           />
 
