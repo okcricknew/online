@@ -34,16 +34,16 @@ export default function MPINForm({
 
           <input
             name="mpin"
-            type="password"
+            type="text"
             inputMode="numeric"
             pattern="[0-9]{4}"
             maxLength={4}
             minLength={4}
             autoFocus
-            autoComplete="one-time-code"
-            data-lpignore="true"
+            autoComplete="off"
             placeholder="••••"
             required
+            style={{ WebkitTextSecurity: 'disc' }}
             className="w-full border-2 border-gray-300 rounded-lg p-4 text-center text-2xl tracking-[0.5em]"
           />
 
