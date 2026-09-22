@@ -1,9 +1,10 @@
-'use client';
+import { getCurrentSession } from '@/lib/auth';
+import { toggleNotifications } from '@/app/actions/auth';
 
-import { useState } from 'react';
+export default async function Header() {
+  const session = await getCurrentSession();
 
-export default function Header() {
-  const [isNotificationsOn, setIsNotificationsOn] = useState(true);
+  const isNotificationsOn = session?.notificationsEnabled ?? true;
 
   return (
     <div className="sticky top-0 z-50 bg-gray-100 pb-1">
@@ -28,18 +29,20 @@ export default function Header() {
               <span className="text-sm">👛</span> ₹0.00
             </div>
 
-            {/* Interactive Notification Bell Button (SSR Friendly) */}
-            <button
-              onClick={() => setIsNotificationsOn(!isNotificationsOn)}
-              className={`w-9 h-9 rounded-full flex items-center justify-center shadow-inner text-sm transition-all duration-200 cursor-pointer ${
-                isNotificationsOn 
-                  ? 'bg-black text-white' 
-                  : 'bg-gray-800 text-gray-400 opacity-80'
-              }`}
-              title={isNotificationsOn ? "Notifications ON" : "Notifications OFF"}
-            >
-              {isNotificationsOn ? '🔔' : '🔕'}
-            </button>
+            {/* Interactive Notification Bell Button (SSR) */}
+            <form action={toggleNotifications}>
+              <button
+                type="submit"
+                className={`w-9 h-9 rounded-full flex items-center justify-center shadow-inner text-sm transition-all duration-200 cursor-pointer ${
+                  isNotificationsOn 
+                    ? 'bg-black text-white' 
+                    : 'bg-gray-800 text-gray-400 opacity-80'
+                }`}
+                title={isNotificationsOn ? "Notifications ON" : "Notifications OFF"}
+              >
+                {isNotificationsOn ? '🔔' : '🔕'}
+              </button>
+            </form>
           </div>
         </div>
 
@@ -91,4 +94,4 @@ export function ActionButtons() {
       </div>
     </div>
   );
-    }
+}
