@@ -489,9 +489,13 @@ export async function verifyMpin(
     );
 
   if (!valid) {
-    redirect(
-      '/?error=Invalid MPIN'
-    );
+  cookieStore.delete(
+    'app_unlocked'
+  );
+
+  redirect(
+    '/?error=Invalid MPIN'
+  );
   }
 
   // MPIN correct.
