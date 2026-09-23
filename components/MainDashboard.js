@@ -20,7 +20,7 @@ export default function MainDashboard({
 
       <main className="p-4 flex flex-col gap-4">
 
-<MarketAutoRefresh interval={30000} />
+<MarketAutoRefresh interval={10000} />
 
         <MarketList />
       </main>
