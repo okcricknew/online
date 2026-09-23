@@ -3,6 +3,7 @@ import MarketList from '@/components/MarketList';
 import BottomNav from '@/components/BottomNav';
 import MPINForm from '@/components/MPINForm';
 import AppSessionGuard from '@/components/AppSessionGuard';
+import MarketAutoRefresh from '@/components/MarketAutoRefresh';
 
 export default function MainDashboard({
   session,
@@ -18,6 +19,9 @@ export default function MainDashboard({
       />
 
       <main className="p-4 flex flex-col gap-4">
+
+<MarketAutoRefresh interval={30000} />
+
         <MarketList />
       </main>
 
