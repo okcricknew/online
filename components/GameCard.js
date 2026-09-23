@@ -1,138 +1,195 @@
-export default function GameCard({ game }) {
-  const state = game?.marketState || {};
-
-  const isClosed = state.status === 'CLOSED';
-  const isClickable = state.clickable === true;
-
+export default function GameCard({
+  game,
+}) {
   const title =
     game?.title ||
     game?.name ||
     'MARKET';
 
-  const numbers =
+  const state =
+    game?.marketState || {};
+
+  const resultInfo =
+    game?.resultInfo || {};
+
+  const result =
+    resultInfo?.display ||
     game?.numbers ||
     game?.result ||
     '***-**-***';
 
-  const openTime =
-    state.openTimeLabel ||
-    game?.openBids ||
-    '--';
-
-  const closeTime =
-    state.closeTimeLabel ||
-    game?.closeBids ||
-    '--';
-
-  const statusLabel =
-    state.label ||
+  const label =
+    state?.label ||
     'CLOSED FOR TODAY';
+
+  const isOpen =
+    state?.clickable === true;
+
+  const isClosed =
+    !isOpen;
 
   return (
     <article
       className={[
-        'w-full overflow-hidden rounded-2xl bg-white shadow-sm',
-        'border border-gray-100',
-        'transition-all duration-200',
-        isClickable
-          ? 'active:scale-[0.99]'
-          : 'opacity-90',
+        'w-full',
+        'rounded-2xl',
+        'bg-white',
+        'shadow-sm',
+        'border',
+        'overflow-hidden',
+        isOpen
+          ? 'border-gray-100'
+          : 'border-gray-200',
+        isClosed
+          ? 'opacity-90'
+          : '',
       ].join(' ')}
-      aria-disabled={!isClickable}
     >
-      {/* TOP MARKET HEADER */}
-      <div className="flex items-center justify-between bg-[#18a4e0] px-4 py-3 text-white">
+      {/* =================================================
+          TOP SECTION
+      ================================================== */}
+
+      <div className="flex items-center justify-between px-4 pt-4">
         <div className="min-w-0">
-          <h2 className="truncate text-[15px] font-extrabold uppercase tracking-wide">
+          <h2 className="truncate text-base font-bold text-gray-900">
             {title}
           </h2>
+
+          <p className="mt-1 text-[11px] text-gray-500">
+            {state?.openStartTimeLabel &&
+            state?.closeEndTimeLabel
+              ? `${state.openStartTimeLabel} - ${state.closeEndTimeLabel}`
+              : 'Market timing'}
+          </p>
         </div>
 
-        <div className="ml-3 shrink-0 text-right">
-          <p className="text-[16px] font-extrabold tracking-wider">
-            {numbers}
+        {/* =================================================
+            STATUS ICON
+        ================================================== */}
+
+        <div
+          className={[
+            'flex h-8 w-8 shrink-0 items-center justify-center',
+            'rounded-full text-sm font-bold',
+            isOpen
+              ? 'bg-green-100 text-green-600'
+              : 'bg-red-100 text-red-600',
+          ].join(' ')}
+          aria-label={
+            isOpen
+              ? 'Market active'
+              : 'Market closed'
+          }
+        >
+          {isOpen ? '✓' : '×'}
+        </div>
+      </div>
+
+      {/* =================================================
+          RESULT
+      ================================================== */}
+
+      <div className="px-4 py-4">
+        <div
+          className={[
+            'rounded-xl',
+            'px-4 py-3',
+            'text-center',
+            isOpen
+              ? 'bg-gray-50'
+              : 'bg-gray-100',
+          ].join(' ')}
+        >
+          <p className="text-2xl font-extrabold tracking-wide text-gray-900">
+            {result}
           </p>
         </div>
       </div>
 
-      {/* MARKET STATUS */}
-      <div className="px-4 pt-3">
-        <div
-          className={[
-            'flex items-center justify-between rounded-xl px-3 py-2',
-            isClosed
-              ? 'bg-red-50'
-              : 'bg-green-50',
-          ].join(' ')}
-        >
+      {/* =================================================
+          STATUS
+      ================================================== */}
+
+      <div
+        className={[
+          'border-t px-4 py-3',
+          isOpen
+            ? 'border-gray-100'
+            : 'border-gray-200',
+        ].join(' ')}
+      >
+        <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
             <p
               className={[
-                'text-[12px] font-extrabold uppercase tracking-wide',
-                isClosed
-                  ? 'text-red-600'
-                  : 'text-green-600',
+                'text-sm font-bold',
+                isOpen
+                  ? 'text-green-600'
+                  : 'text-red-600',
               ].join(' ')}
             >
-              {statusLabel}
+              {label}
             </p>
 
-            {state.reason ? (
-              <p className="mt-0.5 truncate text-[10px] text-gray-500">
+            {state?.reason ? (
+              <p className="mt-1 text-[11px] text-gray-500">
                 {state.reason}
               </p>
             ) : null}
           </div>
 
-          {/* STATUS ICON */}
-          <div
-            className={[
-              'ml-3 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-lg font-black',
-              isClosed
-                ? 'bg-red-100 text-red-600'
-                : 'bg-green-100 text-green-600',
-            ].join(' ')}
-            aria-hidden="true"
-          >
-            {isClosed ? '×' : '✓'}
-          </div>
+          {/* =================================================
+              PHASE
+          ================================================== */}
+
+          {state?.bidMode ? (
+            <span className="shrink-0 rounded-full bg-blue-50 px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-blue-600">
+              {state.bidMode === 'OPEN'
+                ? 'OPEN'
+                : 'CLOSE'}
+            </span>
+          ) : null}
         </div>
       </div>
 
-      {/* OPEN / CLOSE TIME */}
-      <div className="grid grid-cols-2 gap-2 px-4 py-3">
-        {/* OPEN BIDS */}
-        <div className="rounded-xl bg-gray-50 px-3 py-2.5">
-          <p className="text-[10px] font-bold uppercase tracking-wide text-gray-400">
-            OPEN BIDS
+      {/* =================================================
+          TIMING INFORMATION
+      ================================================== */}
+
+      <div className="grid grid-cols-3 border-t border-gray-100">
+        <div className="px-2 py-3 text-center">
+          <p className="text-[9px] font-semibold uppercase text-gray-400">
+            Open Start
           </p>
 
-          <p className="mt-0.5 text-[14px] font-extrabold text-gray-800">
-            {openTime}
+          <p className="mt-1 text-xs font-bold text-gray-700">
+            {state?.openStartTimeLabel ||
+              '--'}
           </p>
         </div>
 
-        {/* CLOSE BIDS */}
-        <div className="rounded-xl bg-gray-50 px-3 py-2.5">
-          <p className="text-[10px] font-bold uppercase tracking-wide text-gray-400">
-            CLOSE BIDS
+        <div className="border-x border-gray-100 px-2 py-3 text-center">
+          <p className="text-[9px] font-semibold uppercase text-gray-400">
+            Open End
           </p>
 
-          <p className="mt-0.5 text-[14px] font-extrabold text-gray-800">
-            {closeTime}
+          <p className="mt-1 text-xs font-bold text-gray-700">
+            {state?.openEndTimeLabel ||
+              '--'}
+          </p>
+        </div>
+
+        <div className="px-2 py-3 text-center">
+          <p className="text-[9px] font-semibold uppercase text-gray-400">
+            Close End
+          </p>
+
+          <p className="mt-1 text-xs font-bold text-gray-700">
+            {state?.closeEndTimeLabel ||
+              '--'}
           </p>
         </div>
       </div>
-
-      {/* BOTTOM INDICATOR */}
-      <div
-        className={[
-          'h-1 w-full',
-          isClosed
-            ? 'bg-red-500'
-            : 'bg-green-500',
-        ].join(' ')}
-      />
     </article>
   );
 }
