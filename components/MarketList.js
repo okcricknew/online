@@ -6,9 +6,32 @@ import {
   getMarkets,
 } from '@/lib/market';
 
+import {
+  syncMarketsToFirebase,
+} from '@/lib/marketSync';
+
 import GameCard from './GameCard';
 
 export default async function MarketList() {
+  /*
+   * Code configuration se Firebase markets sync.
+   *
+   * Isse:
+   * marketConfig.js
+   *        ↓
+   * Firebase games collection
+   *
+   * automatically update hota rahega.
+   */
+  try {
+    await syncMarketsToFirebase();
+  } catch (error) {
+    console.error(
+      'Failed to sync markets to Firebase:',
+      error
+    );
+  }
+
   let games = [];
 
   try {
@@ -64,7 +87,7 @@ export default async function MarketList() {
           game.marketState;
 
         /*
-         * Closed market:
+         * CLOSED market:
          *
          * Card dikhega,
          * lekin clickable nahi hoga.
@@ -79,7 +102,7 @@ export default async function MarketList() {
         }
 
         /*
-         * Open / Close market:
+         * OPEN / CLOSE market:
          *
          * Card clickable hoga.
          */
