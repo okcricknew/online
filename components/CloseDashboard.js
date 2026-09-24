@@ -1,16 +1,5 @@
-'use client';
-
 import Link from 'next/link';
 
-/*
- * CLOSE PHASE KE GAMES
- *
- * Is list ko baad mein apne exact Close games
- * ke according change kar sakte hain.
- *
- * OpenDashboard ke games yahan intentionally
- * include nahi kiye gaye hain.
- */
 const CLOSE_GAME_TYPES = [
   'Single Digit',
   'Jodi Digit',
@@ -57,6 +46,7 @@ export default function CloseDashboard({
   return (
     <main className="min-h-screen bg-gray-100">
       {/* Header */}
+
       <header className="rounded-b-[28px] bg-[#18a4e0] px-4 pb-5 pt-4 text-white shadow-md">
         <div className="flex items-center">
           <Link
@@ -79,7 +69,8 @@ export default function CloseDashboard({
         </div>
       </header>
 
-      {/* Close timing */}
+      {/* Close Timing */}
+
       <section className="px-4 pt-4">
         <div className="rounded-2xl bg-white p-4 shadow-sm">
           <div className="flex items-center justify-between gap-3">
@@ -89,10 +80,12 @@ export default function CloseDashboard({
               </p>
 
               <p className="mt-1 text-sm font-extrabold text-gray-800">
-                {market?.marketState?.openEndTimeLabel ||
+                {market?.marketState
+                  ?.openEndTimeLabel ||
                   '10:00 AM'}
                 {' - '}
-                {market?.marketState?.closeEndTimeLabel ||
+                {market?.marketState
+                  ?.closeEndTimeLabel ||
                   '11:00 AM'}
               </p>
             </div>
@@ -107,15 +100,18 @@ export default function CloseDashboard({
       </section>
 
       {/* Close Games */}
+
       <section
         className="grid grid-cols-2 gap-3 px-4 py-4"
         aria-label="Close games"
       >
         {CLOSE_GAME_TYPES.map(
           (gameType) => (
-            <button
+            <Link
               key={gameType}
-              type="button"
+              href={`/market/${market.id}/close/${encodeURIComponent(
+                gameType
+              )}`}
               className="flex min-h-[116px] flex-col items-center justify-center rounded-2xl border border-blue-100 bg-gradient-to-br from-white to-blue-50 p-3 text-center shadow-sm transition active:scale-[0.98]"
             >
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#18a4e0] text-white shadow-sm">
@@ -125,7 +121,7 @@ export default function CloseDashboard({
               <span className="mt-3 text-xs font-extrabold leading-4 text-gray-700">
                 {gameType}
               </span>
-            </button>
+            </Link>
           )
         )}
       </section>
