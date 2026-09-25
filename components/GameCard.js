@@ -26,7 +26,7 @@ export default function GameCard({
     state?.clickable === true;
 
   return (
-    <article className="w-full rounded-xl bg-white shadow-sm border border-gray-200 p-3 space-y-2">
+    <article className="w-full rounded-xl bg-white shadow-sm border border-gray-200 px-4 py-3.5 space-y-2.5">
       {/* =================================================
           TOP ROW: MARKET TITLE & RESULT
       ================================================== */}
@@ -57,8 +57,8 @@ export default function GameCard({
       {/* =================================================
           BOTTOM ROW: OPEN/CLOSE BIDS & STATUS ICON
       ================================================== */}
-      <div className="pt-2 border-t border-gray-100 flex items-end justify-between">
-        <div className="flex gap-10">
+      <div className="pt-2.5 border-t border-gray-100 flex items-end justify-between">
+        <div className="flex gap-12">
           <div>
             <p className="text-[10px] text-gray-400 font-bold tracking-wider">
               OPEN BIDS
