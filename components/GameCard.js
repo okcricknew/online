@@ -64,7 +64,7 @@ export default function GameCard({
               OPEN BIDS
             </p>
             <p className="text-xs font-bold text-gray-800 mt-0.5">
-              {state?.openStartTimeLabel || '--'}
+              {state?.openEndTimeLabel || '--'}
             </p>
           </div>
 
