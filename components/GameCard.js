@@ -25,169 +25,72 @@ export default function GameCard({
   const isOpen =
     state?.clickable === true;
 
-  const isClosed =
-    !isOpen;
-
   return (
-    <article
-      className={[
-        'w-full',
-        'rounded-2xl',
-        'bg-white',
-        'shadow-sm',
-        'border',
-        'overflow-hidden',
-        isOpen
-          ? 'border-gray-100'
-          : 'border-gray-200',
-        isClosed
-          ? 'opacity-90'
-          : '',
-      ].join(' ')}
-    >
+    <article className="w-full rounded-xl bg-white shadow-sm border border-gray-200 p-3 space-y-2">
       {/* =================================================
-          TOP SECTION
+          TOP ROW: MARKET TITLE & RESULT
       ================================================== */}
+      <div className="flex items-center justify-between">
+        <h2 className="text-sm font-bold text-gray-900 tracking-wide truncate">
+          {title}
+        </h2>
 
-      <div className="flex items-center justify-between px-4 pt-4">
-        <div className="min-w-0">
-          <h2 className="truncate text-base font-bold text-gray-900">
-            {title}
-          </h2>
-
-          <p className="mt-1 text-[11px] text-gray-500">
-            {state?.openStartTimeLabel &&
-            state?.closeEndTimeLabel
-              ? `${state.openStartTimeLabel} - ${state.closeEndTimeLabel}`
-              : 'Market timing'}
-          </p>
-        </div>
-
-        {/* =================================================
-            STATUS ICON
-        ================================================== */}
-
-        <div
-          className={[
-            'flex h-8 w-8 shrink-0 items-center justify-center',
-            'rounded-full text-sm font-bold',
-            isOpen
-              ? 'bg-green-100 text-green-600'
-              : 'bg-red-100 text-red-600',
-          ].join(' ')}
-          aria-label={
-            isOpen
-              ? 'Market active'
-              : 'Market closed'
-          }
-        >
-          {isOpen ? '✓' : '×'}
-        </div>
+        <span className="text-[#0284c7] font-extrabold text-sm tracking-wider">
+          {result}
+        </span>
       </div>
 
       {/* =================================================
-          RESULT
+          STATUS LABEL (Running for Open / Closed for Today)
       ================================================== */}
-
-      <div className="px-4 py-4">
-        <div
+      <div>
+        <span
           className={[
-            'rounded-xl',
-            'px-4 py-3',
-            'text-center',
-            isOpen
-              ? 'bg-gray-50'
-              : 'bg-gray-100',
+            'text-[11px] font-bold uppercase tracking-wide',
+            isOpen ? 'text-green-600' : 'text-red-600',
           ].join(' ')}
         >
-          <p className="text-2xl font-extrabold tracking-wide text-gray-900">
-            {result}
-          </p>
-        </div>
+          {label}
+        </span>
       </div>
 
       {/* =================================================
-          STATUS
+          BOTTOM ROW: OPEN/CLOSE BIDS & STATUS ICON
       ================================================== */}
-
-      <div
-        className={[
-          'border-t px-4 py-3',
-          isOpen
-            ? 'border-gray-100'
-            : 'border-gray-200',
-        ].join(' ')}
-      >
-        <div className="flex items-center justify-between gap-3">
-          <div className="min-w-0">
-            <p
-              className={[
-                'text-sm font-bold',
-                isOpen
-                  ? 'text-green-600'
-                  : 'text-red-600',
-              ].join(' ')}
-            >
-              {label}
+      <div className="pt-2 border-t border-gray-100 flex items-end justify-between">
+        <div className="flex gap-10">
+          <div>
+            <p className="text-[10px] text-gray-400 font-bold tracking-wider">
+              OPEN BIDS
             </p>
-
-            {state?.reason ? (
-              <p className="mt-1 text-[11px] text-gray-500">
-                {state.reason}
-              </p>
-            ) : null}
+            <p className="text-xs font-bold text-gray-800 mt-0.5">
+              {state?.openStartTimeLabel || '--'}
+            </p>
           </div>
 
-          {/* =================================================
-              PHASE
-          ================================================== */}
-
-          {state?.bidMode ? (
-            <span className="shrink-0 rounded-full bg-blue-50 px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-blue-600">
-              {state.bidMode === 'OPEN'
-                ? 'OPEN'
-                : 'CLOSE'}
-            </span>
-          ) : null}
-        </div>
-      </div>
-
-      {/* =================================================
-          TIMING INFORMATION
-      ================================================== */}
-
-      <div className="grid grid-cols-3 border-t border-gray-100">
-        <div className="px-2 py-3 text-center">
-          <p className="text-[9px] font-semibold uppercase text-gray-400">
-            Open Start
-          </p>
-
-          <p className="mt-1 text-xs font-bold text-gray-700">
-            {state?.openStartTimeLabel ||
-              '--'}
-          </p>
+          <div>
+            <p className="text-[10px] text-gray-400 font-bold tracking-wider">
+              CLOSE BIDS
+            </p>
+            <p className="text-xs font-bold text-gray-800 mt-0.5">
+              {state?.closeEndTimeLabel || '--'}
+            </p>
+          </div>
         </div>
 
-        <div className="border-x border-gray-100 px-2 py-3 text-center">
-          <p className="text-[9px] font-semibold uppercase text-gray-400">
-            Open End
-          </p>
-
-          <p className="mt-1 text-xs font-bold text-gray-700">
-            {state?.openEndTimeLabel ||
-              '--'}
-          </p>
-        </div>
-
-        <div className="px-2 py-3 text-center">
-          <p className="text-[9px] font-semibold uppercase text-gray-400">
-            Close End
-          </p>
-
-          <p className="mt-1 text-xs font-bold text-gray-700">
-            {state?.closeEndTimeLabel ||
-              '--'}
-          </p>
+        {/* Status Circular Badge Icon */}
+        <div
+          className={[
+            'w-7 h-7 rounded-full flex items-center justify-center border-2',
+            isOpen
+              ? 'border-green-500 bg-green-50 text-green-600'
+              : 'border-red-500 bg-red-50 text-red-600',
+          ].join(' ')}
+          aria-label={isOpen ? 'Market active' : 'Market closed'}
+        >
+          <span className="text-xs font-extrabold">
+            {isOpen ? '✓' : '✕'}
+          </span>
         </div>
       </div>
     </article>
