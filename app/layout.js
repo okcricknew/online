@@ -5,6 +5,11 @@ export const metadata = {
   description: 'Next.js SSR with Firebase',
 };
 
+// Yeh mobile browser ke status bar aur toolbar ko color dega
+export const viewport = {
+  themeColor: '#0ea5e9', // App ke header ke hisab se color code yahan dalein
+};
+
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
