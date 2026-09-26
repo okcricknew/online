@@ -13,16 +13,6 @@ import {
 import GameCard from './GameCard';
 
 export default async function MarketList() {
-  /*
-   * Code configuration se Firebase markets sync.
-   *
-   * Isse:
-   * marketConfig.js
-   *        ↓
-   * Firebase games collection
-   *
-   * automatically update hota rahega.
-   */
   try {
     await syncMarketsToFirebase();
   } catch (error) {
@@ -57,9 +47,6 @@ export default async function MarketList() {
     );
   }
 
-  /*
-   * Firebase mein koi market nahi hai.
-   */
   if (!games.length) {
     return (
       <section className="px-3 pb-6">
@@ -77,12 +64,15 @@ export default async function MarketList() {
     );
   }
 
+  // FIX: Serialize games data to plain objects so it passes cleanly to Client Components
+  const serializedGames = JSON.parse(JSON.stringify(games));
+
   return (
     <section
       className="space-y-2 px-0 pb-6"
       aria-label="Available markets"
     >
-      {games.map((game) => {
+      {serializedGames.map((game) => {
         const state =
           game.marketState;
 
