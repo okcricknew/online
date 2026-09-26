@@ -11,13 +11,14 @@ export default function MainDashboard({
   mpinUnlocked,
 }) {
   const dashboard = (
-    <div className="max-w-xl mx-auto relative min-h-dvh pb-0 bg-gray-50">
+    <div className="max-w-xl mx-auto relative min-h-dvh pb-14 bg-gray-50">
 
       <Header
         session={session}
       />
 
-      <main className="p-4 flex flex-col gap-4">
+      {/* p-4 ko hata kar px-4 pt-4 pb-0 kiya taaki niche double gap na bane */}
+      <main className="px-4 pt-4 pb-0 flex flex-col gap-4">
         <MarketList />
       </main>
 
