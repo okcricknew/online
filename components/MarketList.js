@@ -79,7 +79,7 @@ export default async function MarketList() {
 
   return (
     <section
-      className="space-y-2 px-3 pb-6"
+      className="space-y-2 px-0 pb-6"
       aria-label="Available markets"
     >
       {games.map((game) => {
