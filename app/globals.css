@@ -31,6 +31,17 @@ body {
   overflow-x: hidden;
 }
 
+/* Header Edge-to-Edge Full Width fix for Desktop/Mobile view */
+.edge-header {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  background-color: #0ea5e9; /* Tailwind sky-500 matching the screenshot */
+}
+
 /* Hide horizontal scrollbar */
 ::-webkit-scrollbar {
   width: 0;
