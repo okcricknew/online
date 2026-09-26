@@ -62,7 +62,7 @@ export default async function MarketList() {
    */
   if (!games.length) {
     return (
-      <section className="px-3 pb-6">
+      <section className="px-3 pb-0">
         <div className="rounded-2xl bg-white p-6 text-center shadow-sm">
           <p className="text-sm font-semibold text-gray-700">
             No games available right now.
