@@ -12,6 +12,8 @@ import {
 
 import GameCard from './GameCard';
 
+import ResultUpdateButton from './ResultUpdateButton';
+
 export default async function MarketList() {
   /*
    * Code configuration se Firebase markets sync.
@@ -87,38 +89,62 @@ export default async function MarketList() {
           game.marketState;
 
         /*
-         * CLOSED market:
+         * =================================================
+         * MARKET CONTENT
          *
-         * Card dikhega,
-         * lekin clickable nahi hoga.
+         * Existing GameCard UI exactly same rahega.
+         * Result button card ke bahar rahega.
+         * =================================================
          */
-        if (!state?.clickable) {
-          return (
-            <GameCard
-              key={game.id}
-              game={game}
-            />
-          );
-        }
 
-        /*
-         * OPEN / CLOSE market:
-         *
-         * Card clickable hoga.
-         */
+        const marketCard = (
+          <GameCard
+            game={game}
+          />
+        );
+
         return (
-          <Link
+          <div
             key={game.id}
-            href={`/market/${game.id}`}
-            className="block"
-            aria-label={`Open ${game.title || 'market'}`}
+            className="w-full"
           >
-            <GameCard
-              game={game}
-            />
-          </Link>
+            {/* =============================================
+                EXISTING MARKET CARD
+            ============================================== */}
+
+            {state?.clickable ? (
+              <Link
+                href={`/market/${game.id}`}
+                className="block"
+                aria-label={`Open ${game.title || 'market'}`}
+              >
+                {marketCard}
+              </Link>
+            ) : (
+              marketCard
+            )}
+
+            {/* =============================================
+                UPDATE RESULTS
+
+                Abhi sab users ke liye visible hai.
+                Baad me admin mobile-number system
+                yahin se control kiya jayega.
+            ============================================== */}
+
+            <div className="mt-1.5 px-3">
+              <ResultUpdateButton
+                marketId={game.id}
+                marketName={
+                  game.title ||
+                  game.name ||
+                  'MARKET'
+                }
+              />
+            </div>
+          </div>
         );
       })}
     </section>
   );
-}
+              }
