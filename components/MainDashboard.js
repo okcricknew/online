@@ -11,14 +11,13 @@ export default function MainDashboard({
   mpinUnlocked,
 }) {
   const dashboard = (
-    <div className="max-w-xl mx-auto relative min-h-screen pb-0 bg-gray-50">
+    <div className="max-w-xl mx-auto relative min-h-dvh pb-24 bg-gray-50">
 
       <Header
         session={session}
       />
 
       <main className="p-4 flex flex-col gap-4">
-
         <MarketList />
       </main>
 
