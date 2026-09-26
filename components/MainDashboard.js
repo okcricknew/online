@@ -11,14 +11,13 @@ export default function MainDashboard({
   mpinUnlocked,
 }) {
   const dashboard = (
-    <div className="max-w-xl mx-auto relative min-h-dvh pb-14 bg-gray-50">
+    <div className="max-w-xl mx-auto relative bg-gray-50 pb-20">
 
       <Header
         session={session}
       />
 
-      {/* p-4 ko hata kar px-4 pt-4 pb-0 kiya taaki niche double gap na bane */}
-      <main className="px-4 pt-4 pb-0 flex flex-col gap-4">
+      <main className="p-4 flex flex-col gap-4">
         <MarketList />
       </main>
 
@@ -33,22 +32,10 @@ export default function MainDashboard({
     />
   );
 
-  /*
-   * Server-side lock.
-   *
-   * Agar server ke paas app_unlocked cookie nahi hai,
-   * to MPIN screen show hogi.
-   */
   if (!isUnlocked) {
     return mpinScreen;
   }
 
-  /*
-   * Server ne MPIN unlock accept kar liya.
-   *
-   * mpinUnlocked = 1 sirf successful MPIN verification
-   * ke turant baad aata hai.
-   */
   return (
     <AppSessionGuard
       lockedContent={mpinScreen}
