@@ -43,7 +43,7 @@ export default async function MarketList() {
     );
 
     return (
-      <section className="px-3 pb-60">
+      <section className="px-3 pb-0">
         <div className="rounded-2xl bg-white p-5 text-center shadow-sm">
           <p className="text-sm font-semibold text-red-600">
             Unable to load markets.
@@ -62,7 +62,7 @@ export default async function MarketList() {
    */
   if (!games.length) {
     return (
-      <section className="px-3 pb-80">
+      <section className="px-3 pb-0">
         <div className="rounded-2xl bg-white p-6 text-center shadow-sm">
           <p className="text-sm font-semibold text-gray-700">
             No games available right now.
@@ -79,7 +79,7 @@ export default async function MarketList() {
 
   return (
     <section
-      className="space-y-2 px-0 pb-90"
+      className="space-y-2 px-0 pb-0"
       aria-label="Available markets"
     >
       {games.map((game) => {
