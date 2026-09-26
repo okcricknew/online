@@ -11,7 +11,7 @@ export default function MainDashboard({
   mpinUnlocked,
 }) {
   const dashboard = (
-    <div className="max-w-xl mx-auto relative min-h-screen pb-20 bg-gray-50">
+    <div className="max-w-xl mx-auto relative min-h-screen pb-0 bg-gray-50">
 
       <Header
         session={session}
