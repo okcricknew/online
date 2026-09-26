@@ -107,9 +107,9 @@ function Item({ icon, title }) {
 
 export function ActionButtons() {
   return (
-    <div className="px-4 -mt-5 relative z-10">
+    <div className="px-4 -mt-2 relative z-10">
 
-      <div className="bg-white border-2 border-black rounded-[20px] py-2.5 px-2 flex justify-around shadow-xl">
+      <div className="bg-white border-2 border-black rounded-[20px] py-2.5 px-2 flex justify-around">
 
         <Item
           icon="💰"
