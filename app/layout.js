@@ -7,7 +7,7 @@ export const metadata = {
 
 // Yeh mobile browser ke status bar aur toolbar ko color dega
 export const viewport = {
-  themeColor: '#0ea5e9', // App ke header ke hisab se color code yahan dalein
+  themeColor: '#18a4e0', // App ke header ke hisab se color code yahan dalein
 };
 
 export default function RootLayout({ children }) {
