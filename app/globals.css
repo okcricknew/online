@@ -31,15 +31,18 @@ body {
   overflow-x: hidden;
 }
 
-/* Header Edge-to-Edge Full Width fix for Desktop/Mobile view */
-.edge-header {
-  width: 100vw;
-  position: relative;
-  left: 50%;
-  right: 50%;
-  margin-left: -50vw;
-  margin-right: -50vw;
-  background-color: #0ea5e9; /* Tailwind sky-500 matching the screenshot */
+/* AUTOMATIC GLOBAL FIX: Saare headers bina kisi component ko chhede edge-to-edge aur blue ho jayenge */
+.mobile-app header,
+.mobile-app [class*="header"],
+.mobile-app [class*="Header"] {
+  width: 100vw !important;
+  position: relative !important;
+  left: 50% !important;
+  right: 50% !important;
+  margin-left: -50vw !important;
+  margin-right: -50vw !important;
+  background-color: #0ea5e9 !important; /* Screenshot wala exact sky blue color */
+  color: #ffffff !important;
 }
 
 /* Hide horizontal scrollbar */
