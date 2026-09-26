@@ -1,6 +1,5 @@
 'use server';
 import { db } from '@/lib/firebaseAdmin';
-import { doc, setDoc } from 'firebase/firestore';
 import { revalidatePath } from 'next/cache';
 
 export async function updateMarketResultAction(marketId, prevState, formData) {
@@ -10,7 +9,7 @@ export async function updateMarketResultAction(marketId, prevState, formData) {
   const closeAnk = formData.get('closeAnk');
   const closePanna = formData.get('closePanna');
 
-  // Server-side calculation
+  // Server-side calculation for 2-Phase Results & Sangams
   const jodi = `${openAnk}${closeAnk}`;
   const fullSangam = `${openPanna}-${jodi}-${closePanna}`;
   const halfSangamA = `${openPanna}-${closeAnk}`;
@@ -30,18 +29,25 @@ export async function updateMarketResultAction(marketId, prevState, formData) {
   };
 
   try {
-    // 1. Historical date-wise document reference in Firebase
-    const historyRef = doc(db, 'markets', marketId, 'history', date);
-    await setDoc(historyRef, resultData, { merge: true });
+    // 1. Historical Date-wise record in Firebase using Admin SDK syntax
+    await db
+      .collection('markets')
+      .doc(marketId)
+      .collection('history')
+      .doc(date)
+      .set(resultData, { merge: true });
 
     // 2. Current active result update
-    const marketRef = doc(db, 'markets', marketId);
-    await setDoc(marketRef, { currentResult: resultData }, { merge: true });
+    await db
+      .collection('markets')
+      .doc(marketId)
+      .set({ currentResult: resultData }, { merge: true });
 
     revalidatePath(`/market/${marketId}`);
-    return { success: true, message: 'Result successfully updated via SSR!' };
+    revalidatePath(`/`);
+    return { success: true, message: 'Result successfully updated!' };
   } catch (error) {
-    console.error('Firebase SSR Error:', error);
+    console.error('Firebase Result Update Error:', error);
     return { success: false, message: error.message };
   }
 }
