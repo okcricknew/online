@@ -2,29 +2,13 @@ import 'server-only';
 
 import Link from 'next/link';
 
-import {
-  getMarkets,
-} from '@/lib/market';
-
-import {
-  syncMarketsToFirebase,
-} from '@/lib/marketSync';
+import { getMarkets } from '@/lib/market';
+import { syncMarketsToFirebase } from '@/lib/marketSync';
 
 import GameCard from './GameCard';
-
 import ResultUpdateButton from './ResultUpdateButton';
 
 export default async function MarketList() {
-  /*
-   * Code configuration se Firebase markets sync.
-   *
-   * Isse:
-   * marketConfig.js
-   *        ↓
-   * Firebase games collection
-   *
-   * automatically update hota rahega.
-   */
   try {
     await syncMarketsToFirebase();
   } catch (error) {
@@ -59,9 +43,6 @@ export default async function MarketList() {
     );
   }
 
-  /*
-   * Firebase mein koi market nahi hai.
-   */
   if (!games.length) {
     return (
       <section className="px-3 pb-0">
@@ -71,8 +52,7 @@ export default async function MarketList() {
           </p>
 
           <p className="mt-1 text-xs text-gray-500">
-            Markets will appear here when they are
-            available.
+            Markets will appear here when they are available.
           </p>
         </div>
       </section>
@@ -85,22 +65,10 @@ export default async function MarketList() {
       aria-label="Available markets"
     >
       {games.map((game) => {
-        const state =
-          game.marketState;
-
-        /*
-         * =================================================
-         * MARKET CONTENT
-         *
-         * Existing GameCard UI exactly same rahega.
-         * Result button card ke bahar rahega.
-         * =================================================
-         */
+        const state = game.marketState;
 
         const marketCard = (
-          <GameCard
-            game={game}
-          />
+          <GameCard game={game} />
         );
 
         return (
@@ -108,10 +76,6 @@ export default async function MarketList() {
             key={game.id}
             className="w-full"
           >
-            {/* =============================================
-                EXISTING MARKET CARD
-            ============================================== */}
-
             {state?.clickable ? (
               <Link
                 href={`/market/${game.id}`}
@@ -123,14 +87,6 @@ export default async function MarketList() {
             ) : (
               marketCard
             )}
-
-            {/* =============================================
-                UPDATE RESULTS
-
-                Abhi sab users ke liye visible hai.
-                Baad me admin mobile-number system
-                yahin se control kiya jayega.
-            ============================================== */}
 
             <div className="mt-1.5 px-3">
               <ResultUpdateButton
@@ -147,4 +103,4 @@ export default async function MarketList() {
       })}
     </section>
   );
-              }
+}
