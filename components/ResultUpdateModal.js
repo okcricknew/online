@@ -2,413 +2,324 @@
 
 import { useEffect, useState } from 'react';
 import {
-  getMarketResult,
-  updateMarketResult,
+getMarketResult,
+updateMarketResult,
 } from '@/app/actions/result';
 
-function getIndiaDate() {
-  const parts = new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'Asia/Kolkata',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).formatToParts(new Date());
+function today() {
+const p = new Intl.DateTimeFormat('en-CA', {
+timeZone: 'Asia/Kolkata',
+year: 'numeric',
+month: '2-digit',
+day: '2-digit',
+}).formatToParts(new Date());
 
-  const data = {};
+const d = {};
+p.forEach(x => {
+if (x.type !== 'literal') d[x.type] = x.value;
+});
 
-  for (const part of parts) {
-    if (part.type !== 'literal') {
-      data[part.type] = part.value;
-    }
-  }
-
-  return `${data.year}-${data.month}-${data.day}`;
+return "${d.year}-${d.month}-${d.day}";
 }
 
 export default function ResultUpdateModal({
-  marketId,
-  marketName,
-  isOpen,
-  onClose,
+marketId,
+marketName,
+isOpen,
+onClose,
 }) {
-  const [dateKey, setDateKey] = useState(getIndiaDate());
+const [dateKey, setDateKey] = useState(today());
+const [openPanna, setOpenPanna] = useState('');
+const [openAnk, setOpenAnk] = useState('');
+const [closeAnk, setCloseAnk] = useState('');
+const [closePanna, setClosePanna] = useState('');
+const [loading, setLoading] = useState(false);
+const [message, setMessage] = useState('');
 
-  const [openPanna, setOpenPanna] = useState('');
-  const [openAnk, setOpenAnk] = useState('');
+useEffect(() => {
+if (isOpen) load(dateKey);
+}, [isOpen, dateKey]);
 
-  const [closeAnk, setCloseAnk] = useState('');
-  const [closePanna, setClosePanna] = useState('');
+async function load(date) {
+if (!marketId || !date) return;
 
-  const [loading, setLoading] = useState(false);
-  const [loadingResult, setLoadingResult] = useState(false);
-  const [message, setMessage] = useState('');
+try {
+  const r = await getMarketResult({
+    marketId,
+    dateKey: date,
+  });
 
-  useEffect(() => {
-    if (!isOpen) return;
-
-    setMessage('');
-    loadResult(dateKey);
-  }, [isOpen]);
-
-  useEffect(() => {
-    if (!isOpen || !dateKey) return;
-
-    loadResult(dateKey);
-  }, [dateKey]);
-
-  async function loadResult(selectedDate) {
-    setLoadingResult(true);
-    setMessage('');
-
-    try {
-      const response = await getMarketResult({
-        marketId,
-        dateKey: selectedDate,
-      });
-
-      if (!response?.success) {
-        setMessage(response?.message || 'Unable to load result.');
-        return;
-      }
-
-      const result = response.result;
-
-      setOpenPanna(result?.openPanna || '');
-      setOpenAnk(result?.openAnk || '');
-      setCloseAnk(result?.closeAnk || '');
-      setClosePanna(result?.closePanna || '');
-    } catch (error) {
-      console.error(error);
-      setMessage('Unable to load result.');
-    } finally {
-      setLoadingResult(false);
-    }
+  if (!r?.success) {
+    setMessage(r?.message || 'Unable to load result.');
+    return;
   }
 
-  async function saveStage(stage) {
-    setMessage('');
+  const x = r.result || {};
 
-    if (stage === 'OPEN') {
-      if (!/^\d{3}$/.test(openPanna)) {
-        setMessage('Open Panna must be 3 digits.');
-        return;
-      }
+  setOpenPanna(x.openPanna || '');
+  setOpenAnk(x.openAnk || '');
+  setCloseAnk(x.closeAnk || '');
+  setClosePanna(x.closePanna || '');
+  setMessage('');
+} catch {
+  setMessage('Unable to load result.');
+}
 
-      if (!/^\d$/.test(openAnk)) {
-        setMessage('Open Ank must be 1 digit.');
-        return;
-      }
-    }
+}
 
-    if (stage === 'CLOSE') {
-      if (!/^\d$/.test(closeAnk)) {
-        setMessage('Close Ank must be 1 digit.');
-        return;
-      }
+async function save(stage) {
+if (loading) return;
+setMessage('');
 
-      if (!/^\d{3}$/.test(closePanna)) {
-        setMessage('Close Panna must be 3 digits.');
-        return;
-      }
-    }
+if (!dateKey) {
+  setMessage('Please select result date.');
+  return;
+}
 
-    setLoading(true);
+if (
+  stage === 'OPEN' &&
+  (!/^\d{3}$/.test(openPanna) ||
+    !/^\d$/.test(openAnk))
+) {
+  setMessage('Open Panna must be 3 digits and Open Ank 1 digit.');
+  return;
+}
 
-    try {
-      const response = await updateMarketResult({
-        marketId,
-        dateKey,
-        stage,
-        openPanna,
-        openAnk,
-        closeAnk,
-        closePanna,
-      });
+if (
+  stage === 'CLOSE' &&
+  (!/^\d$/.test(closeAnk) ||
+    !/^\d{3}$/.test(closePanna))
+) {
+  setMessage('Close Ank must be 1 digit and Close Panna 3 digits.');
+  return;
+}
 
-      if (!response?.success) {
-        setMessage(response?.message || 'Unable to save result.');
-        return;
-      }
+setLoading(true);
 
-      setMessage(response.message || 'Result saved successfully.');
+try {
+  const r = await updateMarketResult({
+    marketId,
+    dateKey,
+    stage,
+    openPanna,
+    openAnk,
+    closeAnk,
+    closePanna,
+  });
 
-      await loadResult(dateKey);
-    } catch (error) {
-      console.error(error);
-      setMessage('Unable to save result.');
-    } finally {
-      setLoading(false);
-    }
+  if (!r?.success) {
+    setMessage(r?.message || 'Unable to save result.');
+    return;
   }
 
-  if (!isOpen) {
-    return null;
-  }
+  setMessage(r.message || 'Result saved successfully.');
+  await load(dateKey);
+} catch {
+  setMessage('Unable to save result.');
+} finally {
+  setLoading(false);
+}
 
-  const hasOpen =
-    /^\d{3}$/.test(openPanna) &&
-    /^\d$/.test(openAnk);
+}
 
-  const hasClose =
-    /^\d$/.test(closeAnk) &&
-    /^\d{3}$/.test(closePanna);
+if (!isOpen) return null;
 
-  const finalResult =
-    hasOpen && hasClose
-      ? `${openPanna}-${openAnk}${closeAnk}-${closePanna}`
-      : '';
+const open =
+/^\d{3}$/.test(openPanna) &&
+/^\d$/.test(openAnk);
 
-  const jodi =
-    hasOpen && hasClose
-      ? `${openAnk}${closeAnk}`
-      : '';
+const close =
+/^\d$/.test(closeAnk) &&
+/^\d{3}$/.test(closePanna);
 
-  const fullSangam =
-    hasOpen && hasClose
-      ? `${openPanna}-${closePanna}`
-      : '';
+const finalResult = open && close
+? "${openPanna}-${openAnk}${closeAnk}-${closePanna}"
+: '';
 
-  const halfSangamA =
-    hasOpen && hasClose
-      ? `${openPanna}-${closeAnk}`
-      : '';
+const jodi = open && close
+? "${openAnk}${closeAnk}"
+: '--';
 
-  const halfSangamB =
-    hasOpen && hasClose
-      ? `${openAnk}-${closePanna}`
-      : '';
+const full = open && close
+? "${openPanna}-${closePanna}"
+: '--';
 
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 px-3">
-      <div className="w-full max-w-md rounded-2xl bg-white shadow-2xl">
+const halfA = open && close
+? "${openPanna}-${closeAnk}"
+: '--';
 
-        {/* Header */}
-        <div className="flex items-center justify-between border-b px-4 py-3">
+const halfB = open && close
+? "${openAnk}-${closePanna}"
+: '--';
+
+const input = (value, set, max, placeholder) => (
+<input
+type="text"
+inputMode="numeric"
+maxLength={max}
+value={value}
+disabled={loading}
+onChange={e =>
+set(
+e.target.value
+.replace(/\D/g, '')
+.slice(0, max)
+)
+}
+placeholder={placeholder}
+className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm font-bold outline-none focus:border-[#18a4e0] disabled:bg-gray-100"
+/>
+);
+
+return (
+<div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 px-3">
+<div className="w-full max-w-md rounded-2xl bg-white shadow-2xl">
+
+    <div className="flex items-center justify-between border-b px-4 py-3">
+      <div>
+        <h2 className="text-base font-extrabold text-gray-900">
+          Update Results
+        </h2>
+        <p className="text-xs font-semibold text-gray-500">
+          {marketName || 'MARKET'}
+        </p>
+      </div>
+
+      <button
+        type="button"
+        onClick={onClose}
+        disabled={loading}
+        className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-lg font-bold text-gray-600"
+      >
+        ×
+      </button>
+    </div>
+
+    <div className="max-h-[80vh] overflow-y-auto p-4">
+
+      <label className="mb-1 block text-xs font-bold text-gray-600">
+        RESULT DATE
+      </label>
+
+      <input
+        type="date"
+        value={dateKey}
+        disabled={loading}
+        onChange={e => {
+          setDateKey(e.target.value);
+          setMessage('');
+        }}
+        className="mb-4 w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm font-semibold outline-none focus:border-[#18a4e0]"
+      />
+
+      {/* OPEN */}
+
+      <div className="rounded-xl border border-gray-200 p-3">
+        <h3 className="mb-3 text-sm font-extrabold text-gray-800">
+          Stage 1 — Open Result
+        </h3>
+
+        <div className="grid grid-cols-2 gap-3">
           <div>
-            <h2 className="text-base font-extrabold text-gray-900">
-              Update Results
-            </h2>
-
-            <p className="text-xs font-semibold text-gray-500">
-              {marketName || 'MARKET'}
-            </p>
+            <label className="mb-1 block text-[11px] font-bold text-gray-500">
+              OPEN PANNA
+            </label>
+            {input(openPanna, setOpenPanna, 3, '690')}
           </div>
 
-          <button
-            type="button"
-            onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-lg font-bold text-gray-600"
-          >
-            ×
-          </button>
+          <div>
+            <label className="mb-1 block text-[11px] font-bold text-gray-500">
+              OPEN ANK
+            </label>
+            {input(openAnk, setOpenAnk, 1, '5')}
+          </div>
         </div>
 
-        {/* Body */}
-        <div className="max-h-[80vh] overflow-y-auto p-4">
+        <button
+          type="button"
+          disabled={loading}
+          onClick={() => save('OPEN')}
+          className="mt-3 w-full rounded-lg bg-[#18a4e0] px-4 py-2.5 text-sm font-bold text-white disabled:opacity-50"
+        >
+          {loading ? 'Saving...' : 'Save Open Result'}
+        </button>
+      </div>
 
-          {/* Date */}
-          <div className="mb-4">
-            <label className="mb-1 block text-xs font-bold text-gray-600">
-              RESULT DATE
+      {/* CLOSE */}
+
+      <div className="mt-3 rounded-xl border border-gray-200 p-3">
+        <h3 className="mb-3 text-sm font-extrabold text-gray-800">
+          Stage 2 — Close Result
+        </h3>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="mb-1 block text-[11px] font-bold text-gray-500">
+              CLOSE ANK
             </label>
-
-            <input
-              type="date"
-              value={dateKey}
-              onChange={(e) => setDateKey(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm font-semibold outline-none focus:border-[#18a4e0]"
-            />
+            {input(closeAnk, setCloseAnk, 1, '9')}
           </div>
 
-          {loadingResult && (
-            <p className="mb-3 text-center text-xs font-semibold text-gray-500">
-              Loading result...
-            </p>
-          )}
+          <div>
+            <label className="mb-1 block text-[11px] font-bold text-gray-500">
+              CLOSE PANNA
+            </label>
+            {input(closePanna, setClosePanna, 3, '360')}
+          </div>
+        </div>
 
-          {/* OPEN RESULT */}
-          <div className="rounded-xl border border-gray-200 p-3">
-            <h3 className="mb-3 text-sm font-extrabold text-gray-800">
-              Stage 1 — Open Result
-            </h3>
+        <button
+          type="button"
+          disabled={loading}
+          onClick={() => save('CLOSE')}
+          className="mt-3 w-full rounded-lg bg-[#18a4e0] px-4 py-2.5 text-sm font-bold text-white disabled:opacity-50"
+        >
+          {loading ? 'Saving...' : 'Save Close Result'}
+        </button>
+      </div>
 
-            <div className="grid grid-cols-2 gap-3">
+      {/* PREVIEW */}
 
-              <div>
-                <label className="mb-1 block text-[11px] font-bold text-gray-500">
-                  OPEN PANNA
-                </label>
+      <div className="mt-3 rounded-xl bg-gray-50 p-3">
+        <h3 className="mb-2 text-xs font-extrabold text-gray-700">
+          RESULT PREVIEW
+        </h3>
 
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  maxLength={3}
-                  value={openPanna}
-                  onChange={(e) =>
-                    setOpenPanna(
-                      e.target.value.replace(/\D/g, '').slice(0, 3)
-                    )
-                  }
-                  placeholder="690"
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm font-bold outline-none focus:border-[#18a4e0]"
-                />
-              </div>
+        <p className="text-center text-xl font-extrabold tracking-wider text-[#0284c7]">
+          {finalResult || '***-**-***'}
+        </p>
 
-              <div>
-                <label className="mb-1 block text-[11px] font-bold text-gray-500">
-                  OPEN ANK
-                </label>
-
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  maxLength={1}
-                  value={openAnk}
-                  onChange={(e) =>
-                    setOpenAnk(
-                      e.target.value.replace(/\D/g, '').slice(0, 1)
-                    )
-                  }
-                  placeholder="5"
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm font-bold outline-none focus:border-[#18a4e0]"
-                />
-              </div>
-
-            </div>
-
-            <button
-              type="button"
-              disabled={loading}
-              onClick={() => saveStage('OPEN')}
-              className="mt-3 w-full rounded-lg bg-[#18a4e0] px-4 py-2.5 text-sm font-bold text-white disabled:opacity-50"
+        <div className="mt-3 grid grid-cols-2 gap-2 text-center">
+          {[
+            ['JODI', jodi],
+            ['FULL SANGAM', full],
+            ['HALF SANGAM A', halfA],
+            ['HALF SANGAM B', halfB],
+          ].map(([title, value]) => (
+            <div
+              key={title}
+              className="rounded-lg bg-white p-2"
             >
-              {loading ? 'Saving...' : 'Save Open Result'}
-            </button>
-          </div>
-
-          {/* CLOSE RESULT */}
-          <div className="mt-3 rounded-xl border border-gray-200 p-3">
-            <h3 className="mb-3 text-sm font-extrabold text-gray-800">
-              Stage 2 — Close Result
-            </h3>
-
-            <div className="grid grid-cols-2 gap-3">
-
-              <div>
-                <label className="mb-1 block text-[11px] font-bold text-gray-500">
-                  CLOSE ANK
-                </label>
-
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  maxLength={1}
-                  value={closeAnk}
-                  onChange={(e) =>
-                    setCloseAnk(
-                      e.target.value.replace(/\D/g, '').slice(0, 1)
-                    )
-                  }
-                  placeholder="9"
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm font-bold outline-none focus:border-[#18a4e0]"
-                />
-              </div>
-
-              <div>
-                <label className="mb-1 block text-[11px] font-bold text-gray-500">
-                  CLOSE PANNA
-                </label>
-
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  maxLength={3}
-                  value={closePanna}
-                  onChange={(e) =>
-                    setClosePanna(
-                      e.target.value.replace(/\D/g, '').slice(0, 3)
-                    )
-                  }
-                  placeholder="360"
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm font-bold outline-none focus:border-[#18a4e0]"
-                />
-              </div>
-
-            </div>
-
-            <button
-              type="button"
-              disabled={loading}
-              onClick={() => saveStage('CLOSE')}
-              className="mt-3 w-full rounded-lg bg-[#18a4e0] px-4 py-2.5 text-sm font-bold text-white disabled:opacity-50"
-            >
-              {loading ? 'Saving...' : 'Save Close Result'}
-            </button>
-          </div>
-
-          {/* PREVIEW */}
-          <div className="mt-3 rounded-xl bg-gray-50 p-3">
-            <h3 className="mb-2 text-xs font-extrabold text-gray-700">
-              RESULT PREVIEW
-            </h3>
-
-            <div className="text-center">
-              <p className="text-xl font-extrabold tracking-wider text-[#0284c7]">
-                {finalResult || '***-**-***'}
+              <p className="text-[10px] font-bold text-gray-400">
+                {title}
+              </p>
+              <p className="text-sm font-extrabold text-gray-800">
+                {value}
               </p>
             </div>
-
-            <div className="mt-3 grid grid-cols-2 gap-2 text-center">
-
-              <div className="rounded-lg bg-white p-2">
-                <p className="text-[10px] font-bold text-gray-400">
-                  JODI
-                </p>
-                <p className="text-sm font-extrabold text-gray-800">
-                  {jodi || '--'}
-                </p>
-              </div>
-
-              <div className="rounded-lg bg-white p-2">
-                <p className="text-[10px] font-bold text-gray-400">
-                  FULL SANGAM
-                </p>
-                <p className="text-sm font-extrabold text-gray-800">
-                  {fullSangam || '--'}
-                </p>
-              </div>
-
-              <div className="rounded-lg bg-white p-2">
-                <p className="text-[10px] font-bold text-gray-400">
-                  HALF SANGAM A
-                </p>
-                <p className="text-sm font-extrabold text-gray-800">
-                  {halfSangamA || '--'}
-                </p>
-              </div>
-
-              <div className="rounded-lg bg-white p-2">
-                <p className="text-[10px] font-bold text-gray-400">
-                  HALF SANGAM B
-                </p>
-                <p className="text-sm font-extrabold text-gray-800">
-                  {halfSangamB || '--'}
-                </p>
-              </div>
-
-            </div>
-          </div>
-
-          {/* MESSAGE */}
-          {message && (
-            <div className="mt-3 rounded-lg bg-gray-100 px-3 py-2 text-center text-xs font-semibold text-gray-700">
-              {message}
-            </div>
-          )}
-
+          ))}
         </div>
-
       </div>
+
+      {message && (
+        <div className="mt-3 rounded-lg bg-gray-100 px-3 py-2 text-center text-xs font-semibold text-gray-700">
+          {message}
+        </div>
+      )}
+
     </div>
-  );
-                }
+  </div>
+</div>
+
+);
+            }
