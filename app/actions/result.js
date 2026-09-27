@@ -74,7 +74,8 @@ export async function updateMarketResult({
    * =======================================================
    */
 
-  const cookieStore = cookies();
+  // FIXED: Added await for cookies() in Next.js 15+
+  const cookieStore = await cookies();
 
   const session =
     await getCurrentSession(
@@ -300,7 +301,8 @@ export async function getMarketResult({
    * =======================================================
    */
 
-  const cookieStore = cookies();
+  // FIXED: Added await for cookies() in Next.js 15+
+  const cookieStore = await cookies();
 
   const session =
     await getCurrentSession(
@@ -410,4 +412,4 @@ export async function getMarketResult({
         'Unable to fetch result.',
     };
   }
-  }
+}
