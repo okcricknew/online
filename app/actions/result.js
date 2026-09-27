@@ -11,19 +11,51 @@ import {
 
 /*
  * =========================================================
- * SAVE RESULT
- *
- * Stage 1:
- * 690-5
- *
- * Stage 2:
- * 9-360
- *
- * Same market + same date par result save hoga.
+ * RESULT ACTIONS
  *
  * IMPORTANT:
- * Abhi admin restriction intentionally nahi hai.
- * Baad me separate admin mobile-number system add hoga.
+ *
+ * dateKey = BUSINESS RESULT DATE
+ *
+ * Example:
+ *
+ * 27 Sep:
+ *   Stage 1 = 690-5
+ *
+ * 28 Sep at 12:15 AM:
+ *   Stage 2 = 9-360
+ *
+ * If dateKey = 2026-09-27,
+ * both stages will remain in:
+ *
+ * games/{marketId}/results/2026-09-27
+ *
+ * 28 Sep ka fresh result tabhi banega
+ * jab dateKey = 2026-09-28 diya jayega.
+ *
+ * Admin restriction abhi intentionally nahi hai.
+ * =========================================================
+ */
+
+
+/*
+ * =========================================================
+ * HELPERS
+ * =========================================================
+ */
+
+function clean(value) {
+  return String(value ?? '').trim();
+}
+
+function isValidDateKey(value) {
+  return /^\d{4}-\d{2}-\d{2}$/.test(value);
+}
+
+
+/*
+ * =========================================================
+ * SAVE / UPDATE MARKET RESULT
  * =========================================================
  */
 
@@ -53,57 +85,70 @@ export async function updateMarketResult({
     return {
       success: false,
       code: 'UNAUTHORIZED',
-      message:
-        'Please login again.',
+      message: 'Please login again.',
     };
   }
 
+
   /*
    * =======================================================
-   * 2. MARKET CHECK
+   * 2. MARKET ID
    * =======================================================
    */
 
-  if (
-    !marketId ||
-    String(marketId).trim() === ''
-  ) {
+  const normalizedMarketId =
+    clean(marketId);
+
+  if (!normalizedMarketId) {
     return {
       success: false,
       code: 'MARKET_ID_REQUIRED',
-      message:
-        'Market ID is required.',
+      message: 'Market ID is required.',
     };
   }
 
+
   /*
    * =======================================================
-   * 3. DATE CHECK
+   * 3. BUSINESS RESULT DATE
+   *
+   * IMPORTANT:
+   * Current date automatically use nahi karenge.
+   *
+   * User jis result date ko select karega,
+   * wahi date Firebase document ke liye use hogi.
    * =======================================================
    */
 
-  if (
-    !dateKey ||
-    String(dateKey).trim() === ''
-  ) {
+  const normalizedDateKey =
+    clean(dateKey);
+
+  if (!normalizedDateKey) {
     return {
       success: false,
       code: 'DATE_REQUIRED',
-      message:
-        'Result date is required.',
+      message: 'Result date is required.',
     };
   }
 
+  if (!isValidDateKey(normalizedDateKey)) {
+    return {
+      success: false,
+      code: 'INVALID_DATE',
+      message:
+        'Invalid result date. Please select a valid date.',
+    };
+  }
+
+
   /*
    * =======================================================
-   * 4. STAGE CHECK
+   * 4. STAGE
    * =======================================================
    */
 
   const normalizedStage =
-    String(stage ?? '')
-      .trim()
-      .toUpperCase();
+    clean(stage).toUpperCase();
 
   if (
     normalizedStage !== 'OPEN' &&
@@ -112,14 +157,45 @@ export async function updateMarketResult({
     return {
       success: false,
       code: 'INVALID_STAGE',
-      message:
-        'Invalid result stage.',
+      message: 'Invalid result stage.',
     };
   }
 
+
   /*
    * =======================================================
-   * 5. SAVE RESULT
+   * 5. CLEAN RESULT VALUES
+   * =======================================================
+   */
+
+  const normalizedOpenPanna =
+    clean(openPanna);
+
+  const normalizedOpenAnk =
+    clean(openAnk);
+
+  const normalizedCloseAnk =
+    clean(closeAnk);
+
+  const normalizedClosePanna =
+    clean(closePanna);
+
+
+  /*
+   * =======================================================
+   * 6. SAVE TO FIREBASE
+   *
+   * saveResultStage() existing result ko read karke
+   * same market + same date par merge karega.
+   *
+   * OPEN:
+   *   690 + 5
+   *
+   * CLOSE:
+   *   9 + 360
+   *
+   * FINAL:
+   *   690-59-360
    * =======================================================
    */
 
@@ -127,38 +203,31 @@ export async function updateMarketResult({
     const result =
       await saveResultStage({
         marketId:
-          String(marketId).trim(),
+          normalizedMarketId,
 
         dateKey:
-          String(dateKey).trim(),
+          normalizedDateKey,
 
         stage:
           normalizedStage,
 
         openPanna:
-          String(
-            openPanna ?? ''
-          ).trim(),
+          normalizedOpenPanna,
 
         openAnk:
-          String(
-            openAnk ?? ''
-          ).trim(),
+          normalizedOpenAnk,
 
         closeAnk:
-          String(
-            closeAnk ?? ''
-          ).trim(),
+          normalizedCloseAnk,
 
         closePanna:
-          String(
-            closePanna ?? ''
-          ).trim(),
+          normalizedClosePanna,
       });
+
 
     /*
      * =====================================================
-     * 6. SUCCESS
+     * 7. SUCCESS RESPONSE
      * =====================================================
      */
 
@@ -174,6 +243,15 @@ export async function updateMarketResult({
         normalizedStage === 'OPEN'
           ? 'Open result saved successfully.'
           : 'Close result saved successfully.',
+
+      marketId:
+        normalizedMarketId,
+
+      dateKey:
+        normalizedDateKey,
+
+      stage:
+        normalizedStage,
 
       result,
     };
@@ -199,8 +277,7 @@ export async function updateMarketResult({
 /*
  * =========================================================
  * GET HISTORICAL RESULT
- *
- * Isko market card / result history me use karenge.
+ * =========================================================
  *
  * Example:
  *
@@ -208,6 +285,8 @@ export async function updateMarketResult({
  *   marketId: 'kalyan',
  *   dateKey: '2026-09-27'
  * })
+ *
+ * Ye exactly selected business date ka result read karega.
  * =========================================================
  */
 
@@ -232,58 +311,86 @@ export async function getMarketResult({
     return {
       success: false,
       code: 'UNAUTHORIZED',
-      message:
-        'Please login again.',
+      message: 'Please login again.',
     };
   }
 
+
   /*
    * =======================================================
-   * 2. BASIC CHECK
+   * 2. MARKET ID
    * =======================================================
    */
 
-  if (
-    !marketId ||
-    String(marketId).trim() === ''
-  ) {
+  const normalizedMarketId =
+    clean(marketId);
+
+  if (!normalizedMarketId) {
     return {
       success: false,
       code: 'MARKET_ID_REQUIRED',
-      message:
-        'Market ID is required.',
+      message: 'Market ID is required.',
     };
   }
 
-  if (
-    !dateKey ||
-    String(dateKey).trim() === ''
-  ) {
-    return {
-      success: false,
-      code: 'DATE_REQUIRED',
-      message:
-        'Result date is required.',
-    };
-  }
 
   /*
    * =======================================================
-   * 3. FIREBASE READ
+   * 3. BUSINESS RESULT DATE
+   * =======================================================
+   */
+
+  const normalizedDateKey =
+    clean(dateKey);
+
+  if (!normalizedDateKey) {
+    return {
+      success: false,
+      code: 'DATE_REQUIRED',
+      message: 'Result date is required.',
+    };
+  }
+
+  if (!isValidDateKey(normalizedDateKey)) {
+    return {
+      success: false,
+      code: 'INVALID_DATE',
+      message:
+        'Invalid result date. Please select a valid date.',
+    };
+  }
+
+
+  /*
+   * =======================================================
+   * 4. FIREBASE READ
    * =======================================================
    */
 
   try {
     const result =
       await getHistoricalResult(
-        String(marketId).trim(),
-        String(dateKey).trim()
+        normalizedMarketId,
+        normalizedDateKey
       );
+
+
+    /*
+     * =====================================================
+     * 5. SUCCESS
+     * =====================================================
+     */
 
     return {
       success: true,
 
       code: 'RESULT_FETCHED',
+
+      marketId:
+        normalizedMarketId,
+
+      dateKey:
+        normalizedDateKey,
 
       result,
     };
@@ -303,4 +410,4 @@ export async function getMarketResult({
         'Unable to fetch result.',
     };
   }
-}
+  }
